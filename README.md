@@ -1,2 +1,6 @@
 # PhotoUpload
-PhotoUpload with GAPI
+
+PhotoUpload - GAPI
+
+GAPI = Google API
+Mono & .NET
