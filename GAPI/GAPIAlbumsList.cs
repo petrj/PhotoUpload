@@ -17,9 +17,7 @@ namespace GAPI
             {
                 var url = "https://photoslibrary.googleapis.com/v1/albums";
 
-                var responseString = GAPIAccountConnection.SendRequest(url, null, "GET", token.access_token);
-
-                return JsonConvert.DeserializeObject<GAPIAlbumsList>(responseString);
+                return GAPIAccountConnection.SendRequest<GAPIAlbumsList>(url, null, "GET", token.access_token);
             }
 
             catch (WebException ex)

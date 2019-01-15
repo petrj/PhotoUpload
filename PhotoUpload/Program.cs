@@ -35,8 +35,8 @@ namespace TestConsole
 
             //GAPIAlbumsList.GetAlbums(accountConn.AccessToken);
             //GAPIAlbum.GetAlbum(accountConn.AccessToken, "ALRvDKd8KyuLfNh6EL0ZUQB1bmO_nOAEdj0hxnJ1_f_Jxo2LJ3qu05qiqWd7cZVZyZOoZAsGbitZ");
-            var alb = GAPIAlbum.CreateAlbum(accountConn.AccessToken, "my new album");
-            alb.SaveToFile("newAlb.json");
+            //var alb = GAPIAlbum.CreateAlbum(accountConn.AccessToken, "my new album");
+            //alb.SaveToFile("newAlb.json");
 
             Console.WriteLine("Finish.");
             Console.ReadLine();

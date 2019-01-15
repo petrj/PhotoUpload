@@ -33,11 +33,7 @@ namespace GAPI
 
                 newAlbum.SaveToFile("newAlbum.json");
 
-                var responseString = GAPIAccountConnection.SendRequest(url, postData, "POST", token.access_token, "application/json");
-
-                var album = JsonConvert.DeserializeObject<GAPIAlbum>(responseString);
-
-                return album;
+                return GAPIAccountConnection.SendRequest<GAPIAlbum>(url, newAlbum, token.access_token);
             }
             catch (WebException ex)
             {
@@ -64,9 +60,7 @@ namespace GAPI
             {
                 var url = $"https://photoslibrary.googleapis.com/v1/albums/{idFix}";
 
-                var responseString = GAPIAccountConnection.SendRequest(url, null, "GET", token.access_token);
-
-                var alb = JsonConvert.DeserializeObject<GAPIAlbum>(responseString);
+                var alb = GAPIAccountConnection.SendRequest<GAPIAlbum>(url, null, "GET", token.access_token);
 
                 Console.WriteLine(alb.ToString());
 

@@ -86,9 +86,7 @@ namespace GAPI
                 postData += $"&redirect_uri={redirectURI}";
                 postData += $"&grant_type=authorization_code";
 
-                var responseString = SendRequest(url, postData,"GET", null);
-
-                AccessToken = JsonConvert.DeserializeObject<GAPIAccessToken>(responseString);
+                AccessToken = SendRequest<GAPIAccessToken>(url, postData,"POST", null);
                 AccessToken.expires_at = DateTime.Now.AddSeconds(Convert.ToDouble(AccessToken.expires_in));
             }
             catch (Exception ex)
@@ -113,9 +111,7 @@ namespace GAPI
                 postData += $"&client_secret={AuthInfo.client_secret}";
                 postData += $"&grant_type=refresh_token";
 
-                var responseString = SendRequest(url, postData, "GET");
-
-                AccessToken = JsonConvert.DeserializeObject<GAPIAccessToken>(responseString);
+                AccessToken = SendRequest<GAPIAccessToken>(url, postData, "POST");
                 AccessToken.expires_at = DateTime.Now.AddSeconds(Convert.ToDouble(AccessToken.expires_in));
             }
             catch (Exception ex)
@@ -125,7 +121,15 @@ namespace GAPI
             }
         }
 
-        public static string SendRequest(string url, 
+
+        public static T SendRequest<T>(string url,
+                GAPIBaseObject obj,
+                string accessToken = null)
+        {
+            return SendRequest<T>(url, JsonConvert.SerializeObject(obj), "POST", accessToken, "application/json");
+        }
+
+         public static T SendRequest<T>(string url, 
                 string data, 
                 string method,
                 string accessToken = null,
@@ -146,7 +150,7 @@ namespace GAPI
             var request = (HttpWebRequest)WebRequest.Create(url);
 
             request.Method = method;
-            request.ContentType = "contentType";
+            request.ContentType = contentType;
 
             if (!String.IsNullOrEmpty(accessToken))
             {
@@ -178,7 +182,7 @@ namespace GAPI
             Console.WriteLine(responseString);
             Console.WriteLine();
 
-            return responseString;
+            return JsonConvert.DeserializeObject<T>(responseString);
         }
     }
 }
