@@ -1,10 +1,11 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <ProjectGuid>{5C3F74E3-03EB-4450-9C12-8FDECD6C905C}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <RootNamespace>GAPI</RootNamespace>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugType>full</DebugType>
@@ -27,6 +28,9 @@
     <Compile Include="GAPIAccessToken.cs" />
     <Compile Include="GAPIClientAuthorizationInfo.cs" />
     <Compile Include="GAPIAccountConnection.cs" />
+    <Compile Include="GAPINewAlbum.cs" />
+    <Compile Include="GAPISharedAlbumOptions.cs" />
+    <Compile Include="GAPIShareInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json">

@@ -125,12 +125,18 @@ namespace GAPI
             }
         }
 
-        public static string SendRequest(string url, string postData, string method = "POST", string accessToken = null)
+        public static string SendRequest(string url, string data, string method = "POST", string accessToken = null)
         {
-            var browserUrl = $"{url}?{postData}";
+            var browserUrl = $"{url}?{data}";
 
-            Console.WriteLine("Generated url:");
-            Console.WriteLine($"{url}?{postData}");
+            if (method == "GET")
+            {
+                Console.WriteLine($"Sending request to url: {url}?{data}");
+            } else
+            {
+                Console.WriteLine($"Sending request to url: {url}");
+                Console.WriteLine($"Posting: {data}");
+            }
             Console.WriteLine();
 
             var request = (HttpWebRequest)WebRequest.Create(url);
@@ -148,15 +154,15 @@ namespace GAPI
 
             if (method == "POST")
             {
-                var data = string.IsNullOrEmpty(postData)
+                var postData = string.IsNullOrEmpty(data)
                 ? new byte[0]
-                : Encoding.ASCII.GetBytes(postData);
+                : Encoding.ASCII.GetBytes(data);
 
                 request.ContentLength = data.Length;
 
                 using (var stream = request.GetRequestStream())
                 {
-                    stream.Write(data, 0, data.Length);
+                    stream.Write(postData, 0, data.Length);
                 }
             }
 
