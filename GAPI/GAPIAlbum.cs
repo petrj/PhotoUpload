@@ -31,7 +31,9 @@ namespace GAPI
 
                 var postData = JsonConvert.SerializeObject(newAlbum);
 
-                var responseString = GAPIAccountConnection.SendRequest(url, postData, "POST", token.access_token);
+                newAlbum.SaveToFile("newAlbum.json");
+
+                var responseString = GAPIAccountConnection.SendRequest(url, postData, "POST", token.access_token, "application/json");
 
                 var album = JsonConvert.DeserializeObject<GAPIAlbum>(responseString);
 

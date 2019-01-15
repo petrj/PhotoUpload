@@ -1,0 +1,9 @@
+{
+  "client_id": "xxxxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.apps.googleusercontent.com",
+  "client_secret": "xxxxxxxxxxxxxxxxxxxxxxxx",
+  "scopes": [
+    "https://www.googleapis.com/auth/photoslibrary",
+    "https://www.googleapis.com/auth/photoslibrary.readonly",
+    "https://www.googleapis.com/auth/photoslibrary.readonly.appcreateddata",
+    ]
+}

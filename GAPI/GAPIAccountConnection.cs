@@ -86,7 +86,7 @@ namespace GAPI
                 postData += $"&redirect_uri={redirectURI}";
                 postData += $"&grant_type=authorization_code";
 
-                var responseString = SendRequest(url, postData);
+                var responseString = SendRequest(url, postData,"GET", null);
 
                 AccessToken = JsonConvert.DeserializeObject<GAPIAccessToken>(responseString);
                 AccessToken.expires_at = DateTime.Now.AddSeconds(Convert.ToDouble(AccessToken.expires_in));
@@ -113,7 +113,7 @@ namespace GAPI
                 postData += $"&client_secret={AuthInfo.client_secret}";
                 postData += $"&grant_type=refresh_token";
 
-                var responseString = SendRequest(url, postData);
+                var responseString = SendRequest(url, postData, "GET");
 
                 AccessToken = JsonConvert.DeserializeObject<GAPIAccessToken>(responseString);
                 AccessToken.expires_at = DateTime.Now.AddSeconds(Convert.ToDouble(AccessToken.expires_in));
@@ -125,16 +125,20 @@ namespace GAPI
             }
         }
 
-        public static string SendRequest(string url, string data, string method = "POST", string accessToken = null)
+        public static string SendRequest(string url, 
+                string data, 
+                string method,
+                string accessToken = null,
+                string contentType = "application/x-www-form-urlencoded")
         {
             var browserUrl = $"{url}?{data}";
 
             if (method == "GET")
             {
-                Console.WriteLine($"Sending request to url: {url}?{data}");
+                Console.WriteLine($"Sending GET Grequest to url: {url}?{data}");
             } else
             {
-                Console.WriteLine($"Sending request to url: {url}");
+                Console.WriteLine($"Sending POST request to url: {url}");
                 Console.WriteLine($"Posting: {data}");
             }
             Console.WriteLine();
@@ -142,7 +146,7 @@ namespace GAPI
             var request = (HttpWebRequest)WebRequest.Create(url);
 
             request.Method = method;
-            request.ContentType = "application/x-www-form-urlencoded; charset=utf-8";
+            request.ContentType = "contentType";
 
             if (!String.IsNullOrEmpty(accessToken))
             {
