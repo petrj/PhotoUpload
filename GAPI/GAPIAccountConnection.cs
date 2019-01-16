@@ -16,7 +16,10 @@ namespace GAPI
         public GAPIAccountConnection(GAPIClientAuthorizationInfo authInfo)
         {
             AuthInfo = authInfo;
+        }
 
+        public void Connect()
+        {
             var tokenPath = $"{GAPIBaseObject.AppDataDir}token.json";
 
             if (File.Exists(tokenPath))
@@ -129,28 +132,30 @@ namespace GAPI
             return SendRequest<T>(url, JsonConvert.SerializeObject(obj), "POST", accessToken, "application/json");
         }
 
-         public static T SendRequest<T>(string url, 
-                string data, 
-                string method,
-                string accessToken = null,
-                string contentType = "application/x-www-form-urlencoded")
+        /// <summary>
+        /// Sends the request.
+        /// </summary>
+        /// <returns>The request.</returns>
+        /// <param name="request">Request.</param>
+        /// <param name="data">POST Data</param>
+        /// <param name="accessToken">Access token.</param>
+        /// <typeparam name="T">The 1st type parameter.</typeparam>
+        private static string SendRequestBase(HttpWebRequest request,
+               string data,              
+               string accessToken = null)
         {
-            var browserUrl = $"{url}?{data}";
-
-            if (method == "GET")
+            if (request.Method == "GET")
             {
-                Console.WriteLine($"Sending GET Grequest to url: {url}?{data}");
-            } else
-            {
-                Console.WriteLine($"Sending POST request to url: {url}");
-                Console.WriteLine($"Posting: {data}");
+                Console.WriteLine($"Sending GET Grequest to url: {request.RequestUri}?{data}");
             }
+            else
+            {
+                Console.WriteLine($"Sending POST request to url: {request.RequestUri}");
+                Console.WriteLine($"Posting data length: {data.Length}");
+            }
+
+            Console.WriteLine($"ContentType: {request.ContentType}");
             Console.WriteLine();
-
-            var request = (HttpWebRequest)WebRequest.Create(url);
-
-            request.Method = method;
-            request.ContentType = contentType;
 
             if (!String.IsNullOrEmpty(accessToken))
             {
@@ -160,7 +165,7 @@ namespace GAPI
                 request.Accept = "application/json";
             }
 
-            if (method == "POST")
+            if (request.Method == "POST")
             {
                 var postData = string.IsNullOrEmpty(data)
                 ? new byte[0]
@@ -182,7 +187,50 @@ namespace GAPI
             Console.WriteLine(responseString);
             Console.WriteLine();
 
+            //return (T)Convert.ChangeType(obj, typeof(T));
+
+            return responseString;
+        }
+
+        public static T SendRequest<T>(string url, 
+                string data, 
+                string method,
+                string accessToken = null,
+                string contentType = "application/x-www-form-urlencoded")
+        {
+            var request = (HttpWebRequest)WebRequest.Create(url);
+
+            request.Method = method;
+            request.ContentType = contentType;
+
+            var responseString = SendRequestBase(request, data, accessToken);
+            
             return JsonConvert.DeserializeObject<T>(responseString);
+        }
+
+
+        public string UploadFile(string fileName)
+        {
+            Console.WriteLine($"Uploading file {fileName}");
+
+            // https://developers.google.com/photos/library/guides/upload-media
+
+            var url = "https://photoslibrary.googleapis.com/v1/uploads";
+
+            var request = (HttpWebRequest)WebRequest.Create(url);
+
+            request.Method = "POST";
+            request.ContentType = "application/octet-stream";
+            request.Headers["X-Goog-Upload-File-Name"] = Path.GetFileName(fileName);
+            request.Headers["X-Goog-Upload-Protocol"] = "raw";
+
+            string data = new StreamReader(File.Open(fileName, FileMode.Open)).ReadToEnd();
+
+            string responseString = SendRequestBase(request, data, AccessToken.access_token);
+
+            Console.WriteLine($"Request result: {responseString}");
+
+            return responseString;
         }
     }
 }

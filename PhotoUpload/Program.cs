@@ -32,13 +32,18 @@ namespace TestConsole
             }
 
             var accountConn = new GAPIAccountConnection(authInfo);
+            accountConn.Connect();
 
-            //GAPIAlbumsList.GetAlbums(accountConn.AccessToken);
+            //var allAlbs = GAPIAlbumsList.GetAllAlbums(accountConn.AccessToken);
+            //Console.WriteLine($"All albums total count: {allAlbs.albums.Count.ToString()}");
             //GAPIAlbum.GetAlbum(accountConn.AccessToken, "ALRvDKd8KyuLfNh6EL0ZUQB1bmO_nOAEdj0hxnJ1_f_Jxo2LJ3qu05qiqWd7cZVZyZOoZAsGbitZ");
-            //var alb = GAPIAlbum.CreateAlbum(accountConn.AccessToken, "my new album");
+            //var alb = GAPIAlbum.CreateAlbum(accountConn.AccessToken, "7th labum created from GAPI");
             //alb.SaveToFile("newAlb.json");
 
-            Console.WriteLine("Finish.");
+            //var fileToken = accountConn.UploadFile("/temp/S0415.JPG");
+
+            Console.WriteLine();
+            Console.WriteLine("Process finished. Press Enter.......");
             Console.ReadLine();
         }
     }
