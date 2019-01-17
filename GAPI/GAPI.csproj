@@ -23,14 +23,28 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="GAPIAlbum.cs" />
+    <Compile Include="GAPIAlbumPosition.cs" />
     <Compile Include="GAPIAlbumsList.cs" />
     <Compile Include="GAPIBaseObject.cs" />
     <Compile Include="GAPIAccessToken.cs" />
     <Compile Include="GAPIClientAuthorizationInfo.cs" />
     <Compile Include="GAPIAccountConnection.cs" />
+    <Compile Include="GAPIContributorInfo.cs" />
+    <Compile Include="GAPIMediaItem.cs" />
+    <Compile Include="GAPIMediaMetadata.cs" />
+    <Compile Include="GAPIPhoto.cs" />
+    <Compile Include="GAPIStatus.cs" />
     <Compile Include="GAPINewAlbum.cs" />
+    <Compile Include="GAPINewMediaItemResult.cs" />
+    <Compile Include="GAPINewMediaItemResults.cs" />
+    <Compile Include="GAPINewMediaItems.cs" />
+    <Compile Include="GAPIPositionType.cs" />
     <Compile Include="GAPISharedAlbumOptions.cs" />
     <Compile Include="GAPIShareInfo.cs" />
+    <Compile Include="GAPISimpleMediaItem.cs" />
+    <Compile Include="GAPIVideo.cs" />
+    <Compile Include="GLAPINewMediaItem.cs" />
+    <Compile Include="GAPIVideoProcessingStatus.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json">

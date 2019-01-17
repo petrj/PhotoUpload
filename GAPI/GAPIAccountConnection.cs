@@ -26,30 +26,42 @@ namespace GAPI
             {
                 AccessToken = GAPIBaseObject.LoadFromFile<GAPIAccessToken>("token.json");
 
-                if (AccessToken.expires_at < DateTime.Now)
+                if (string.IsNullOrEmpty(AccessToken.refresh_token))
                 {
-                    RefreshAccessToken();
-                    AccessToken.SaveToFile("token.json");
+                    Authenticate();
+                }
+                else
+                {
+                    if (AccessToken.expires_at < DateTime.Now)
+                    {
+                        RefreshAccessToken();
+                        AccessToken.SaveToFile("token.json");
+                    }
                 }
             }
             else
             {
-                // authenticate user & user consent
-
-                var browserUrl = GetUrlForAuthCode();
-
-                Console.WriteLine("Authorize on url:");
-                Console.WriteLine();
-                Console.WriteLine(browserUrl);
-                Console.WriteLine();
-
-                Console.Write("Paste auth code:");
-                var code = Console.ReadLine();
-
-                ReceiveAccessToken(code);
-
-                AccessToken.SaveToFile("token.json");
+                Authenticate();
             }
+        }
+
+        public void Authenticate()
+        {
+            // authenticate user & user consent
+
+            var browserUrl = GetUrlForAuthCode();
+
+            Console.WriteLine("Authorize on url:");
+            Console.WriteLine();
+            Console.WriteLine(browserUrl);
+            Console.WriteLine();
+
+            Console.Write("Paste auth code:");
+            var code = Console.ReadLine();
+
+            ReceiveAccessToken(code);
+
+            AccessToken.SaveToFile("token.json");
         }
 
         public string GetUrlForAuthCode()
@@ -141,7 +153,7 @@ namespace GAPI
         /// <param name="accessToken">Access token.</param>
         /// <typeparam name="T">The 1st type parameter.</typeparam>
         private static string SendRequestBase(HttpWebRequest request,
-               string data,              
+               string data,
                string accessToken = null)
         {
             if (request.Method == "GET")
@@ -192,8 +204,8 @@ namespace GAPI
             return responseString;
         }
 
-        public static T SendRequest<T>(string url, 
-                string data, 
+        public static T SendRequest<T>(string url,
+                string data,
                 string method,
                 string accessToken = null,
                 string contentType = "application/x-www-form-urlencoded")
@@ -204,7 +216,7 @@ namespace GAPI
             request.ContentType = contentType;
 
             var responseString = SendRequestBase(request, data, accessToken);
-            
+
             return JsonConvert.DeserializeObject<T>(responseString);
         }
 
