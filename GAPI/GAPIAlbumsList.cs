@@ -49,16 +49,7 @@ namespace GAPI
 
             catch (WebException ex)
             {
-                Console.WriteLine(ex);
-
-                if (ex.Status == WebExceptionStatus.ProtocolError)
-                {
-                    var response = ex.Response as HttpWebResponse;
-                    if (response != null)
-                    {
-                        Console.WriteLine($"Status code: {(int)response.StatusCode}");
-                    }
-                }
+                Logger.WriteToLog(ex);
                 throw;
             }
         }

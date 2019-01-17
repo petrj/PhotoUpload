@@ -9,6 +9,6 @@ namespace GAPI
     public class GLAPINewMediaItem : GAPIBaseObject
     {
         public string description { get; set; }
-        public GLAPINewMediaItem simpleMediaItem { get; set; } = new GLAPINewMediaItem();
+        public GAPISimpleMediaItem simpleMediaItem { get; set; } = new GAPISimpleMediaItem();
     }
 }

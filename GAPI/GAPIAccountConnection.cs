@@ -106,7 +106,7 @@ namespace GAPI
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
+                Logger.WriteToLog(ex);
                 throw;
             }
         }
@@ -131,7 +131,7 @@ namespace GAPI
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
+                Logger.WriteToLog(ex);
                 throw;
             }
         }
@@ -158,16 +158,19 @@ namespace GAPI
         {
             if (request.Method == "GET")
             {
-                Console.WriteLine($"Sending GET Grequest to url: {request.RequestUri}?{data}");
+                Logger.WriteToLog($"Sending GET Grequest to url: {request.RequestUri}?{data}");
             }
             else
             {
-                Console.WriteLine($"Sending POST request to url: {request.RequestUri}");
-                Console.WriteLine($"Posting data length: {data.Length}");
+                Logger.WriteToLog($"Sending POST request to url: {request.RequestUri}");
+                Logger.WriteToLog($"Posting data length: {data.Length}");
+                if (request.ContentType != "application/octet-stream")
+                {
+                    Logger.WriteToLog($"Posting data: {data}");
+                }
             }
 
-            Console.WriteLine($"ContentType: {request.ContentType}");
-            Console.WriteLine();
+            Logger.WriteToLog($"ContentType: {request.ContentType}");
 
             if (!String.IsNullOrEmpty(accessToken))
             {
@@ -195,9 +198,8 @@ namespace GAPI
 
             var responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();
 
-            Console.WriteLine("Response:");
-            Console.WriteLine(responseString);
-            Console.WriteLine();
+            Logger.WriteToLog("Response:");
+            Logger.WriteToLog(responseString);
 
             //return (T)Convert.ChangeType(obj, typeof(T));
 
@@ -223,7 +225,7 @@ namespace GAPI
 
         public string UploadFile(string fileName)
         {
-            Console.WriteLine($"Uploading file {fileName}");
+            Logger.WriteToLog($"Uploading file {fileName}");
 
             // https://developers.google.com/photos/library/guides/upload-media
 
@@ -240,7 +242,7 @@ namespace GAPI
 
             string responseString = SendRequestBase(request, data, AccessToken.access_token);
 
-            Console.WriteLine($"Request result: {responseString}");
+            Logger.WriteToLog($"Request result: {responseString}");
 
             return responseString;
         }

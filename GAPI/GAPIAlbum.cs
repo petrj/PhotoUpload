@@ -37,16 +37,7 @@ namespace GAPI
             }
             catch (WebException ex)
             {
-                Console.WriteLine(ex);
-
-                if (ex.Status == WebExceptionStatus.ProtocolError)
-                {
-                    var response = ex.Response as HttpWebResponse;
-                    if (response != null)
-                    {
-                        Console.WriteLine($"Status code: {(int)response.StatusCode}");
-                    }
-                }
+                Logger.WriteToLog(ex);
                 throw;
             }
         }
@@ -62,22 +53,54 @@ namespace GAPI
 
                 var alb = GAPIAccountConnection.SendRequest<GAPIAlbum>(url, null, "GET", token.access_token);
 
-                Console.WriteLine(alb.ToString());
+                Logger.WriteToLog(alb.ToString());
 
                 return alb;
             }
             catch (WebException ex)
             {
-                Console.WriteLine(ex);
+                Logger.WriteToLog(ex);
+                throw;
+            }
+        }
 
-                if (ex.Status == WebExceptionStatus.ProtocolError)
-                {
-                    var response = ex.Response as HttpWebResponse;
-                    if (response != null)
-                    {
-                        Console.WriteLine($"Status code: {(int)response.StatusCode}");
-                    }
-                }
+        /// <summary>
+        /// Adding media to album
+        /// </summary>
+        /// <param name="items">
+        /// Key .... upload_token (result from UploadFile)
+        /// Value .. item description
+        /// </param>
+        /// <returns></returns>
+        public static GAPINewMediaItemResults AddMediaItemsToAlbum(GAPIAccessToken token, string albumId, Dictionary<string,string> items)
+        {
+            // https://developers.google.com/photos/library/reference/rest/v1/mediaItems/batchCreate
+
+            var url = "https://photoslibrary.googleapis.com/v1/mediaItems:batchCreate";
+
+            var newMediaItems = new GAPINewMediaItems();
+            newMediaItems.albumId = albumId;
+
+            foreach (var kvp in items)
+            {
+                var newMediaItem = new GLAPINewMediaItem();
+                newMediaItem.description = kvp.Value;
+                newMediaItem.simpleMediaItem.uploadToken = kvp.Key;
+
+                newMediaItems.newMediaItems.Add(newMediaItem);
+            }
+
+            try
+            {
+                var newMediaItemResults = GAPIAccountConnection.SendRequest<GAPINewMediaItemResults>(url, newMediaItems, token.access_token);
+
+                Logger.WriteToLog(newMediaItemResults.ToString());
+
+                return newMediaItemResults;
+            }
+            catch (WebException ex)
+            {
+                Logger.WriteToLog(ex);
                 throw;
             }
         }

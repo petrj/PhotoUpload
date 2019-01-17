@@ -45,6 +45,7 @@
     <Compile Include="GAPIVideo.cs" />
     <Compile Include="GLAPINewMediaItem.cs" />
     <Compile Include="GAPIVideoProcessingStatus.cs" />
+    <Compile Include="GAPILogger.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json">

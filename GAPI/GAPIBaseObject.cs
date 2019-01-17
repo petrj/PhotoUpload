@@ -13,10 +13,10 @@ namespace GAPI
             get
             {
                 var sep = Path.DirectorySeparatorChar.ToString();
-                var dir = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + sep + "GAPI" + sep;
-                if (!Directory.Exists(dir))
+                var dir = System.AppDomain.CurrentDomain.BaseDirectory;
+                if (!dir.EndsWith(sep))
                 {
-                    Directory.CreateDirectory(dir);
+                    dir += sep;
                 }
 
                 return dir;
@@ -32,7 +32,7 @@ namespace GAPI
 
             File.WriteAllText(name, this.ToString());
 
-            Console.WriteLine($"Saved to file: {name}");
+            Logger.WriteToLog($"Saved to file: {name}");
         }
 
         public static T LoadFromFile<T>(string name)
