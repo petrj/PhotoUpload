@@ -28,21 +28,28 @@ namespace GAPI
 
                 if (string.IsNullOrEmpty(AccessToken.refresh_token))
                 {
+                    Logger.WriteToLog("Empty refresh token");
+
                     Authenticate();
                 }
                 else
                 {
                     if (AccessToken.expires_at < DateTime.Now)
                     {
+                        Logger.WriteToLog($"Access token expired at [{AccessToken.expires_at.ToString()}]");
+
                         RefreshAccessToken();
-                        AccessToken.SaveToFile("token.json");
                     }
                 }
             }
             else
             {
-                Authenticate();
+                Logger.WriteToLog("Access token does not exist");
+
+                Authenticate(); 
             }
+
+            Logger.WriteToLog($"Access token will expire at [{AccessToken.expires_at.ToString()}]");
         }
 
         public void Authenticate()
@@ -51,17 +58,15 @@ namespace GAPI
 
             var browserUrl = GetUrlForAuthCode();
 
-            Console.WriteLine("Authorize on url:");
-            Console.WriteLine();
-            Console.WriteLine(browserUrl);
-            Console.WriteLine();
+            Logger.WriteToLog("Authorize on url:");
+            Logger.WriteToLog();
+            Logger.WriteToLog(browserUrl);
+            Logger.WriteToLog();
 
             Console.Write("Paste auth code:");
             var code = Console.ReadLine();
 
             ReceiveAccessToken(code);
-
-            AccessToken.SaveToFile("token.json");
         }
 
         public string GetUrlForAuthCode()
@@ -103,6 +108,8 @@ namespace GAPI
 
                 AccessToken = SendRequest<GAPIAccessToken>(url, postData,"POST", null);
                 AccessToken.expires_at = DateTime.Now.AddSeconds(Convert.ToDouble(AccessToken.expires_in));
+
+                AccessToken.SaveToFile("token.json");
             }
             catch (Exception ex)
             {
@@ -128,6 +135,8 @@ namespace GAPI
 
                 AccessToken = SendRequest<GAPIAccessToken>(url, postData, "POST");
                 AccessToken.expires_at = DateTime.Now.AddSeconds(Convert.ToDouble(AccessToken.expires_in));
+
+                AccessToken.SaveToFile("token.json");
             }
             catch (Exception ex)
             {
@@ -153,31 +162,30 @@ namespace GAPI
         /// <param name="accessToken">Access token.</param>
         /// <typeparam name="T">The 1st type parameter.</typeparam>
         private static string SendRequestBase(HttpWebRequest request,
-               string data,
+               string ASCIIPOSTdata,
                string accessToken = null)
         {
             if (request.Method == "GET")
             {
-                Logger.WriteToLog($"Sending GET Grequest to url: {request.RequestUri}?{data}");
+                Logger.WriteToLog($"Sending GET request to url: {request.RequestUri}");
             }
             else
             {
                 Logger.WriteToLog($"Sending POST request to url: {request.RequestUri}");
 
-                if (data == null)
+                if (request.ContentLength >= 0)
                 {
-                    if (request.ContentLength >=0)
+                    Logger.WriteToLog($"Request ContentLength: {request.ContentLength}");
+                }
+
+                if (ASCIIPOSTdata != null)
+                {
+                    Logger.WriteToLog($"Posting data length: {ASCIIPOSTdata.Length}");
+
+                    if (request.ContentType != "application/octet-stream")
                     {
-                        Logger.WriteToLog($"Posting data length: {request.ContentLength}");
+                        Logger.WriteToLog($"Posting data: {ASCIIPOSTdata}");
                     }
-                }
-                else
-                {
-                    Logger.WriteToLog($"Posting data length: {data.Length}");
-                }
-                if ((request.ContentType != "application/octet-stream") && (data != null))
-                {
-                    Logger.WriteToLog($"Posting data: {data}");
                 }
             }
 
@@ -188,34 +196,46 @@ namespace GAPI
                 accessToken = WebUtility.UrlEncode(accessToken);
                 request.Headers.Add("Authorization", "Bearer " + accessToken);
                 request.PreAuthenticate = true;
-                if (request.Accept == null)
-                {
-                    request.Accept = "application/json";
-                }
             }
 
-            if (request.Method == "POST" && request.ContentLength<0 && data != null)
+            if (request.Method == "POST" && ASCIIPOSTdata != null)
             {
-                // adding post data when not included before
+                // adding post data 
 
-                var postData = string.IsNullOrEmpty(data)
+                var postData = string.IsNullOrEmpty(ASCIIPOSTdata)
                 ? new byte[0]
-                : Encoding.ASCII.GetBytes(data);
+                : Encoding.ASCII.GetBytes(ASCIIPOSTdata);
 
-                request.ContentLength = data.Length;
+                request.ContentLength = ASCIIPOSTdata.Length;
 
                 using (var stream = request.GetRequestStream())
                 {
-                    stream.Write(postData, 0, data.Length);
+                    stream.Write(postData, 0, ASCIIPOSTdata.Length);
                 }
+            }
+
+            Logger.WriteToLog($"Method: {request.Method}");
+            Logger.WriteToLog($"RequestUri: {request.RequestUri}");
+            Logger.WriteToLog($"ContentType: {request.ContentType}");
+            Logger.WriteToLog($"ContentLength: {request.ContentLength}");
+
+            foreach (var header in request.Headers)
+            {
+                Logger.WriteToLog($"Header: {header.ToString()}");
             }
 
             var response = (HttpWebResponse)request.GetResponse();
 
             var responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();
 
-            Logger.WriteToLog("Response:");
-            Logger.WriteToLog(responseString);
+            Logger.WriteToLog($"Response: {responseString}");
+            Logger.WriteToLog();
+            Logger.WriteToLog($"StatusCode: {response.StatusCode}");
+            Logger.WriteToLog($"StatusDescription: {response.StatusDescription}");
+
+            Logger.WriteToLog($"ContentLength: {response.ContentLength}");
+            Logger.WriteToLog($"ContentType: {response.ContentType}");
+            Logger.WriteToLog($"ContentEncoding: {response.ContentEncoding}");
 
             return responseString;
         }
@@ -230,18 +250,33 @@ namespace GAPI
 
             request.Method = method;
             request.ContentType = contentType;
+            request.Accept = "application/json";
 
             var responseString = SendRequestBase(request, data, accessToken);
 
             return JsonConvert.DeserializeObject<T>(responseString);
         }
 
+        /// <summary>
+        /// Upload files.
+        /// </summary>
+        /// <returns>Key .. uploadToken, value .. filename</returns>
+        /// <param name="fileNames">File names.</param>
+        public Dictionary<string, string> UploadFiles(List<string> fileNames)
+        {
+            var result = new Dictionary<string,string>();
+            foreach (var filename in fileNames)
+            {
+                result.Add(UploadFile(filename),filename);
+            }
+
+            return result;
+        }
 
         public string UploadFile(string fileName)
         {
             try
             {
-
                 Logger.WriteToLog($"Uploading file {fileName}");
 
                 // https://developers.google.com/photos/library/guides/upload-media
@@ -249,25 +284,15 @@ namespace GAPI
                 var url = "https://photoslibrary.googleapis.com/v1/uploads";
 
                 var request = (HttpWebRequest)WebRequest.Create(url);
-                              
-              //var totalBytesRead = 0;
-
-              var bytesRead = 0;
-              byte[] buffer = new byte[1024];
-
-                if (!String.IsNullOrEmpty(AccessToken.access_token))
-                {
-                    var accessToken = WebUtility.UrlEncode(AccessToken.access_token);
-                    request.Headers.Add("Authorization", "Bearer " + accessToken);
-                    request.PreAuthenticate = true;
-                }
 
                 request.Method = "POST";
-
                 request.ContentType = "application/octet-stream";
                 request.Headers["X-Goog-Upload-File-Name"] = Path.GetFileName(fileName);
                 request.Headers["X-Goog-Upload-Protocol"] = "raw";
 
+                // fill request stream buffer with file
+                var bytesRead = 0;
+                byte[] buffer = new byte[1024];
                 var requestStream = request.GetRequestStream();
                 using (var fs = System.IO.File.OpenRead(fileName))
                 {
@@ -277,30 +302,9 @@ namespace GAPI
                     }
                 }
 
-                Logger.WriteToLog($"Method: {request.Method}");
-                Logger.WriteToLog($"RequestUri: {request.RequestUri}");
-                Logger.WriteToLog($"ContentType: {request.ContentType}");
+                var responseString = SendRequestBase(request, null, AccessToken.access_token);
 
-                foreach (var header in request.Headers)
-                {
-                    Logger.WriteToLog($"Header: {header.ToString()}");
-                }
-
-                Logger.WriteToLog($"ContentLength: {request.ContentLength}");
-
-                var response = (HttpWebResponse)request.GetResponse();
-
-                var responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();
-
-                Logger.WriteToLog($"Response: {responseString}");
-                Logger.WriteToLog($"StatusCode: {response.StatusCode}");
-                Logger.WriteToLog($"StatusDescription: {response.StatusDescription}");
-
-                Logger.WriteToLog($"ContentLength: {response.ContentLength}");
-                Logger.WriteToLog($"ContentType: {response.ContentType}");
-                Logger.WriteToLog($"ContentEncoding: {response.ContentEncoding}");
-
-                return responseString;
+                return responseString;               
 
             } catch (Exception ex)
             {

@@ -42,13 +42,18 @@ namespace GAPI
 			}
 		}
 
-		public static void WriteToLog(string message, Exception ex)
+        public static void WriteToLog()
+        {
+            WriteToLog(null, null);
+        }
+
+        public static void WriteToLog(string message, Exception ex)
 		{
-			message = "[" + DateTime.Now.ToString("yyyy-MM-dd--HH:mm:ss") + "] "+  message;
+            var dt = "[" + DateTime.Now.ToString("yyyy-MM-dd--HH:mm:ss") + "] ";
 
 			if (ex != null)
 			{
-				message += "---> Error: " + ex.ToString();
+				message += " ---> Error: " + ex.ToString();
 
                 if (ex is WebException)
                 {
@@ -71,7 +76,7 @@ namespace GAPI
             {
                 using (StreamWriter sw = new StreamWriter(fs, System.Text.Encoding.UTF8))
                 {
-                    sw.WriteLine(message);
+                    sw.WriteLine(dt + message);
                     sw.Close();
                 }
                 fs.Close();

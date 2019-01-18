@@ -27,7 +27,7 @@ namespace TestConsole
             }
             else
             {
-                Console.WriteLine($"Missing {tokenPath}");
+                Logger.WriteToLog($"Missing {tokenPath}");
                 return;
             }
 
@@ -35,27 +35,42 @@ namespace TestConsole
             accountConn.Connect();
 
             //var allAlbs = GAPIAlbumsList.GetAllAlbums(accountConn.AccessToken);
-            //Console.WriteLine($"All albums total count: {allAlbs.albums.Count.ToString()}");
+            //Logger.WriteToLog($"All albums total count: {allAlbs.albums.Count.ToString()}");
             //GAPIAlbum.GetAlbum(accountConn.AccessToken, "ALRvDKd8KyuLfNh6EL0ZUQB1bmO_nOAEdj0hxnJ1_f_Jxo2LJ3qu05qiqWd7cZVZyZOoZAsGbitZ");
-            //var alb = GAPIAlbum.CreateAlbum(accountConn.AccessToken, "7th labum created from GAPI");
-            //alb.SaveToFile("newAlb.json");
 
-            var fileToken = accountConn.UploadFile(@"/temp/1x1.png");
-            if (!string.IsNullOrEmpty(fileToken))
+            UploadFolderToAlbum(accountConn, new DirectoryInfo("/temp/Greenpark"));
+
+            Logger.WriteToLog();
+
+            Console.WriteLine("Process finished. Press Enter.......");
+            Console.ReadLine();
+        }
+
+        public static void UploadFolderToAlbum(GAPIAccountConnection accountConn, DirectoryInfo directory, string albumName = null)
+        {
+            if (albumName == null)
+                albumName = directory.Name;
+
+            var alb = GAPIAlbum.CreateAlbum(accountConn.AccessToken, albumName);
+
+            var files = directory.GetFiles();
+            var fileNames = new List<string>();
+            foreach (var f in files)
             {
+                fileNames.Add(f.FullName);
+            }
 
-                var itemsToUpoad = new Dictionary<string, string>() { { fileToken, "foto.png" } };
-                var uploadedItems = GAPIAlbum.AddMediaItemsToAlbum(accountConn.AccessToken, "ALRvDKcpzu2dtJT3mjS1JYOonliG0pvScB3RuCVzq2qNxDynvDCzwnA-RPNM5hQKq_032_VEQdtu", itemsToUpoad);
-                uploadedItems.SaveToFile("uploadedItems.json");
+            var fileTokens = accountConn.UploadFiles(fileNames);
+
+            if (fileTokens != null)
+            {
+                var uploadedItems = GAPIAlbum.AddMediaItemsToAlbum(accountConn.AccessToken, alb.id, fileTokens);
 
             }
             else
             {
-                Console.WriteLine("Upload failed");
+                Logger.WriteToLog("Upload failed - empty fileTokens");
             }
-            Console.WriteLine();
-            Console.WriteLine("Process finished. Press Enter.......");
-            Console.ReadLine();
         }
     }
 }
