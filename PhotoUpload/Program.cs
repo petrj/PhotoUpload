@@ -40,11 +40,19 @@ namespace TestConsole
             //var alb = GAPIAlbum.CreateAlbum(accountConn.AccessToken, "7th labum created from GAPI");
             //alb.SaveToFile("newAlb.json");
 
-            var fileToken = accountConn.UploadFile(@"c:\temp\foto.jpg");
-            var itemsToUpoad = new Dictionary<string, string>() { { fileToken, "foto.jpg" } };
-            var uploadedItems = GAPIAlbum.AddMediaItemsToAlbum(accountConn.AccessToken, "ALRvDKcpzu2dtJT3mjS1JYOonliG0pvScB3RuCVzq2qNxDynvDCzwnA-RPNM5hQKq_032_VEQdtu", itemsToUpoad);
-            uploadedItems.SaveToFile("uploadedItems.json");
+            var fileToken = accountConn.UploadFile(@"/temp/1x1.png");
+            if (!string.IsNullOrEmpty(fileToken))
+            {
 
+                var itemsToUpoad = new Dictionary<string, string>() { { fileToken, "foto.png" } };
+                var uploadedItems = GAPIAlbum.AddMediaItemsToAlbum(accountConn.AccessToken, "ALRvDKcpzu2dtJT3mjS1JYOonliG0pvScB3RuCVzq2qNxDynvDCzwnA-RPNM5hQKq_032_VEQdtu", itemsToUpoad);
+                uploadedItems.SaveToFile("uploadedItems.json");
+
+            }
+            else
+            {
+                Console.WriteLine("Upload failed");
+            }
             Console.WriteLine();
             Console.WriteLine("Process finished. Press Enter.......");
             Console.ReadLine();

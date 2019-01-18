@@ -188,7 +188,10 @@ namespace GAPI
                 accessToken = WebUtility.UrlEncode(accessToken);
                 request.Headers.Add("Authorization", "Bearer " + accessToken);
                 request.PreAuthenticate = true;
-                request.Accept = "application/json";
+                if (request.Accept == null)
+                {
+                    request.Accept = "application/json";
+                }
             }
 
             if (request.Method == "POST" && request.ContentLength<0 && data != null)
@@ -246,49 +249,56 @@ namespace GAPI
                 var url = "https://photoslibrary.googleapis.com/v1/uploads";
 
                 var request = (HttpWebRequest)WebRequest.Create(url);
+                              
+              //var totalBytesRead = 0;
+
+              var bytesRead = 0;
+              byte[] buffer = new byte[1024];
+
+                if (!String.IsNullOrEmpty(AccessToken.access_token))
+                {
+                    var accessToken = WebUtility.UrlEncode(AccessToken.access_token);
+                    request.Headers.Add("Authorization", "Bearer " + accessToken);
+                    request.PreAuthenticate = true;
+                }
 
                 request.Method = "POST";
+
                 request.ContentType = "application/octet-stream";
                 request.Headers["X-Goog-Upload-File-Name"] = Path.GetFileName(fileName);
                 request.Headers["X-Goog-Upload-Protocol"] = "raw";
 
-                var totalBytesRead = 0;
-
-                var bytesRead = 0;
-                byte[] buffer = new byte[1024];
-
-                // File => MemoryStream
-                using (var stream = new MemoryStream())
+                var requestStream = request.GetRequestStream();
+                using (var fs = System.IO.File.OpenRead(fileName))
                 {
-                    using (FileStream fileStream = new FileStream(fileName, FileMode.Open, FileAccess.Read))
+                    while ((bytesRead = fs.Read(buffer, 0, buffer.Length)) != 0)
                     {
-                        while ((bytesRead = fileStream.Read(buffer, 0, buffer.Length)) != 0)
-                        {
-                            stream.Write(buffer, 0, bytesRead);
-                            totalBytesRead += bytesRead;
-                        }
-                    }
-
-                    // muse be set before filling request
-                    request.ContentLength = totalBytesRead;
-                    stream.Position = 0;
-
-                    // MemoryStream => RequestStream
-                    using (var requestStream = request.GetRequestStream())
-                    {
-                        using (var sw = new StreamWriter(requestStream))
-                        {
-                            while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) != 0)
-                            {
-                                requestStream.Write(buffer, 0, bytesRead);
-                            }
-                        }
+                        requestStream.Write(buffer, 0, bytesRead);
                     }
                 }
 
-                string responseString = SendRequestBase(request, null, AccessToken.access_token);
+                Logger.WriteToLog($"Method: {request.Method}");
+                Logger.WriteToLog($"RequestUri: {request.RequestUri}");
+                Logger.WriteToLog($"ContentType: {request.ContentType}");
 
-                Logger.WriteToLog($"Request result: {responseString}");
+                foreach (var header in request.Headers)
+                {
+                    Logger.WriteToLog($"Header: {header.ToString()}");
+                }
+
+                Logger.WriteToLog($"ContentLength: {request.ContentLength}");
+
+                var response = (HttpWebResponse)request.GetResponse();
+
+                var responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();
+
+                Logger.WriteToLog($"Response: {responseString}");
+                Logger.WriteToLog($"StatusCode: {response.StatusCode}");
+                Logger.WriteToLog($"StatusDescription: {response.StatusDescription}");
+
+                Logger.WriteToLog($"ContentLength: {response.ContentLength}");
+                Logger.WriteToLog($"ContentType: {response.ContentType}");
+                Logger.WriteToLog($"ContentEncoding: {response.ContentEncoding}");
 
                 return responseString;
 
