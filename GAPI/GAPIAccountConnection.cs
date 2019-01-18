@@ -163,8 +163,19 @@ namespace GAPI
             else
             {
                 Logger.WriteToLog($"Sending POST request to url: {request.RequestUri}");
-                Logger.WriteToLog($"Posting data length: {data.Length}");
-                if (request.ContentType != "application/octet-stream")
+
+                if (data == null)
+                {
+                    if (request.ContentLength >=0)
+                    {
+                        Logger.WriteToLog($"Posting data length: {request.ContentLength}");
+                    }
+                }
+                else
+                {
+                    Logger.WriteToLog($"Posting data length: {data.Length}");
+                }
+                if ((request.ContentType != "application/octet-stream") && (data != null))
                 {
                     Logger.WriteToLog($"Posting data: {data}");
                 }
@@ -180,8 +191,10 @@ namespace GAPI
                 request.Accept = "application/json";
             }
 
-            if (request.Method == "POST")
+            if (request.Method == "POST" && request.ContentLength<0 && data != null)
             {
+                // adding post data when not included before
+
                 var postData = string.IsNullOrEmpty(data)
                 ? new byte[0]
                 : Encoding.ASCII.GetBytes(data);
@@ -200,8 +213,6 @@ namespace GAPI
 
             Logger.WriteToLog("Response:");
             Logger.WriteToLog(responseString);
-
-            //return (T)Convert.ChangeType(obj, typeof(T));
 
             return responseString;
         }
@@ -225,26 +236,67 @@ namespace GAPI
 
         public string UploadFile(string fileName)
         {
-            Logger.WriteToLog($"Uploading file {fileName}");
+            try
+            {
 
-            // https://developers.google.com/photos/library/guides/upload-media
+                Logger.WriteToLog($"Uploading file {fileName}");
 
-            var url = "https://photoslibrary.googleapis.com/v1/uploads";
+                // https://developers.google.com/photos/library/guides/upload-media
 
-            var request = (HttpWebRequest)WebRequest.Create(url);
+                var url = "https://photoslibrary.googleapis.com/v1/uploads";
 
-            request.Method = "POST";
-            request.ContentType = "application/octet-stream";
-            request.Headers["X-Goog-Upload-File-Name"] = Path.GetFileName(fileName);
-            request.Headers["X-Goog-Upload-Protocol"] = "raw";
+                var request = (HttpWebRequest)WebRequest.Create(url);
 
-            string data = new StreamReader(File.Open(fileName, FileMode.Open)).ReadToEnd();
+                request.Method = "POST";
+                request.ContentType = "application/octet-stream";
+                request.Headers["X-Goog-Upload-File-Name"] = Path.GetFileName(fileName);
+                request.Headers["X-Goog-Upload-Protocol"] = "raw";
 
-            string responseString = SendRequestBase(request, data, AccessToken.access_token);
+                var totalBytesRead = 0;
 
-            Logger.WriteToLog($"Request result: {responseString}");
+                var bytesRead = 0;
+                byte[] buffer = new byte[1024];
 
-            return responseString;
+                // File => MemoryStream
+                using (var stream = new MemoryStream())
+                {
+                    using (FileStream fileStream = new FileStream(fileName, FileMode.Open, FileAccess.Read))
+                    {
+                        while ((bytesRead = fileStream.Read(buffer, 0, buffer.Length)) != 0)
+                        {
+                            stream.Write(buffer, 0, bytesRead);
+                            totalBytesRead += bytesRead;
+                        }
+                    }
+
+                    // muse be set before filling request
+                    request.ContentLength = totalBytesRead;
+                    stream.Position = 0;
+
+                    // MemoryStream => RequestStream
+                    using (var requestStream = request.GetRequestStream())
+                    {
+                        using (var sw = new StreamWriter(requestStream))
+                        {
+                            while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) != 0)
+                            {
+                                requestStream.Write(buffer, 0, bytesRead);
+                            }
+                        }
+                    }
+                }
+
+                string responseString = SendRequestBase(request, null, AccessToken.access_token);
+
+                Logger.WriteToLog($"Request result: {responseString}");
+
+                return responseString;
+
+            } catch (Exception ex)
+            {
+                Logger.WriteToLog(ex);
+                throw;
+            }
         }
     }
 }

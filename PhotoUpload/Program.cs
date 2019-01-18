@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
-using System.Text;
 using GAPI;
+using System.Text;
 
 namespace TestConsole
 {
@@ -40,9 +40,8 @@ namespace TestConsole
             //var alb = GAPIAlbum.CreateAlbum(accountConn.AccessToken, "7th labum created from GAPI");
             //alb.SaveToFile("newAlb.json");
 
-            //var fileToken = accountConn.UploadFile("/temp/S0415.JPG");
-
-            var itemsToUpoad = new Dictionary<string, string>() { { @"CAIS6QIAMbP+LfaB8gauQBXDq4SwIIifInCKoqwZds0oLBj5dhspsZVfRQcm7SOHmBFnBieFq1pnaTi/ELw5uHRXnnCBAmyJtqwFd2KVY0jNBlBPrXxo+uOCUAPcwUWjDqFjJeVYt7yS4YK1M/LdVg/3TKvDmsRguF4T3Cpnvbwf5MdsQ8qAncZYd5xSaGiBoqk1iDIcGgWNaGedjvqVSaN3INDJQL3Jr60i+q9p1j8ABBiOBe97dzg/cuhx1q1DasjJi5ALu5kf1e3LAQmjUdW74f9vFX9Zjm8YUh+EKChGXsZU9lIUPXmxc77SxcGhhN0n5hXT8le6/aJmz57UoM23ipJvId+BE3BdpNnSTrwlMagc5satX5LUF3KS7zsmKaCFUVrz0sp1buz083Tn9QIwYb/o9f3fmoQWREekqp5TRKxsV7r5MLGF0LwF3rWwqAYwE7zD2WdUZ8HL6dcKpNPiFCeMYRNWAHqUs5Aa", "S0415.JPG" } };
+            var fileToken = accountConn.UploadFile(@"c:\temp\foto.jpg");
+            var itemsToUpoad = new Dictionary<string, string>() { { fileToken, "foto.jpg" } };
             var uploadedItems = GAPIAlbum.AddMediaItemsToAlbum(accountConn.AccessToken, "ALRvDKcpzu2dtJT3mjS1JYOonliG0pvScB3RuCVzq2qNxDynvDCzwnA-RPNM5hQKq_032_VEQdtu", itemsToUpoad);
             uploadedItems.SaveToFile("uploadedItems.json");
 
