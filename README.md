@@ -1,6 +1,11 @@
 # PhotoUpload
 
-PhotoUpload - GAPI
+CLI Application for uploading media to Google Photo
 
-GAPI = Google API
-Mono & .NET
+- folders on file system uploaded as Google Photo albums 
+- Mono & .NET
+- Linux & Windows compatibile
+- Powered by GAPI (Mono & .NET Google API)
+
+
+
