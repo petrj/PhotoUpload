@@ -49,7 +49,7 @@ namespace GAPI
 
             catch (WebException ex)
             {
-                Logger.WriteToLog(ex);
+                Logger.Error(ex);
                 throw;
             }
         }

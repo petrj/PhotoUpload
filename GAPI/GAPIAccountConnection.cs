@@ -28,7 +28,7 @@ namespace GAPI
 
                 if (string.IsNullOrEmpty(AccessToken.refresh_token))
                 {
-                    Logger.WriteToLog("Empty refresh token");
+                    Logger.Info("Empty refresh token");
 
                     Authenticate();
                 }
@@ -36,7 +36,7 @@ namespace GAPI
                 {
                     if (AccessToken.expires_at < DateTime.Now)
                     {
-                        Logger.WriteToLog($"Access token expired at [{AccessToken.expires_at.ToString()}]");
+                        Logger.Info($"Access token expired at [{AccessToken.expires_at.ToString()}]");
 
                         RefreshAccessToken();
                     }
@@ -44,24 +44,25 @@ namespace GAPI
             }
             else
             {
-                Logger.WriteToLog("Access token does not exist");
+                Logger.Info("Access token does not exist");
 
                 Authenticate(); 
             }
 
-            Logger.WriteToLog($"Access token will expire at [{AccessToken.expires_at.ToString()}]");
+            Logger.Info($"Access token will expire at [{AccessToken.expires_at.ToString()}]");
         }
 
         public void Authenticate()
         {
             // authenticate user & user consent
+            Logger.Info("Authenticating user");
 
             var browserUrl = GetUrlForAuthCode();
 
-            Logger.WriteToLog("Authorize on url:");
-            Logger.WriteToLog();
-            Logger.WriteToLog(browserUrl);
-            Logger.WriteToLog();
+            Console.WriteLine("Authorize on url:");
+            Console.WriteLine();
+            Console.WriteLine(browserUrl);
+            Console.WriteLine();
 
             Console.Write("Paste auth code:");
             var code = Console.ReadLine();
@@ -91,6 +92,8 @@ namespace GAPI
 
         public void ReceiveAccessToken(string code)
         {
+            Logger.Info("Receiving access token");
+
             // https://developers.google.com/identity/protocols/OAuth2InstalledApp
 
             var redirectURI = "urn:ietf:wg:oauth:2.0:oob";
@@ -113,13 +116,15 @@ namespace GAPI
             }
             catch (Exception ex)
             {
-                Logger.WriteToLog(ex);
+                Logger.Error(ex);
                 throw;
             }
         }
 
         public void RefreshAccessToken()
         {
+            Logger.Info("Refreshing access token");
+
             // https://developers.google.com/identity/protocols/OAuth2InstalledApp
 
             var refreshTokenFix = WebUtility.UrlEncode(AccessToken.refresh_token);
@@ -142,7 +147,7 @@ namespace GAPI
             }
             catch (Exception ex)
             {
-                Logger.WriteToLog(ex);
+                Logger.Error(ex);
                 throw;
             }
         }
@@ -167,29 +172,29 @@ namespace GAPI
         {
             if (request.Method == "GET")
             {
-                Logger.WriteToLog($"Sending GET request to url: {request.RequestUri}");
+                Logger.Info($"Sending GET request to url: {request.RequestUri}");
             }
             else
             {
-                Logger.WriteToLog($"Sending POST request to url: {request.RequestUri}");
+                Logger.Info($"Sending POST request to url: {request.RequestUri}");
 
                 if (request.ContentLength >= 0)
                 {
-                    Logger.WriteToLog($"Request ContentLength: {request.ContentLength}");
+                    Logger.Debug($"Request ContentLength: {request.ContentLength}");
                 }
 
                 if (ASCIIPOSTdata != null)
                 {
-                    Logger.WriteToLog($"Posting data length: {ASCIIPOSTdata.Length}");
+                    Logger.Debug($"Posting data length: {ASCIIPOSTdata.Length}");
 
                     if (request.ContentType != "application/octet-stream")
                     {
-                        Logger.WriteToLog($"Posting data: {ASCIIPOSTdata}");
+                        Logger.Debug($"Posting data: {ASCIIPOSTdata}");
                     }
                 }
             }
 
-            Logger.WriteToLog($"ContentType: {request.ContentType}");
+            Logger.Info($"ContentType: {request.ContentType}");
 
             if (!String.IsNullOrEmpty(accessToken))
             {
@@ -214,28 +219,27 @@ namespace GAPI
                 }
             }
 
-            Logger.WriteToLog($"Method: {request.Method}");
-            Logger.WriteToLog($"RequestUri: {request.RequestUri}");
-            Logger.WriteToLog($"ContentType: {request.ContentType}");
-            Logger.WriteToLog($"ContentLength: {request.ContentLength}");
+            Logger.Debug($"Method: {request.Method}");
+            Logger.Debug($"RequestUri: {request.RequestUri}");
+            Logger.Debug($"ContentType: {request.ContentType}");
+            Logger.Debug($"ContentLength: {request.ContentLength}");
 
             foreach (var header in request.Headers)
             {
-                Logger.WriteToLog($"Header: {header.ToString()}");
+                Logger.Debug($"Header: {header.ToString()}");
             }
 
             var response = (HttpWebResponse)request.GetResponse();
 
             var responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();
 
-            Logger.WriteToLog($"Response: {responseString}");
-            Logger.WriteToLog();
-            Logger.WriteToLog($"StatusCode: {response.StatusCode}");
-            Logger.WriteToLog($"StatusDescription: {response.StatusDescription}");
+            Logger.Debug($"Response: {responseString}");
+            Logger.Debug($"StatusCode: {response.StatusCode}");
+            Logger.Debug($"StatusDescription: {response.StatusDescription}");
 
-            Logger.WriteToLog($"ContentLength: {response.ContentLength}");
-            Logger.WriteToLog($"ContentType: {response.ContentType}");
-            Logger.WriteToLog($"ContentEncoding: {response.ContentEncoding}");
+            Logger.Debug($"ContentLength: {response.ContentLength}");
+            Logger.Debug($"ContentType: {response.ContentType}");
+            Logger.Debug($"ContentEncoding: {response.ContentEncoding}");
 
             return responseString;
         }
@@ -277,7 +281,7 @@ namespace GAPI
         {
             try
             {
-                Logger.WriteToLog($"Uploading file {fileName}");
+                Logger.Info($"Uploading file {fileName}");
 
                 // https://developers.google.com/photos/library/guides/upload-media
 
@@ -308,7 +312,7 @@ namespace GAPI
 
             } catch (Exception ex)
             {
-                Logger.WriteToLog(ex);
+                Logger.Error(ex);
                 throw;
             }
         }

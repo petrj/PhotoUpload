@@ -32,7 +32,7 @@ namespace GAPI
 
             File.WriteAllText(name, this.ToString());
 
-            Logger.WriteToLog($"Saved to file: {name}");
+            Logger.Info($"Saved to file: {name}");
         }
 
         public static T LoadFromFile<T>(string name)

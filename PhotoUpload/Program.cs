@@ -27,20 +27,20 @@ namespace TestConsole
             }
             else
             {
-                Logger.WriteToLog($"Missing {tokenPath}");
+                Logger.Info($"Missing {tokenPath}");
                 return;
             }
 
             var accountConn = new GAPIAccountConnection(authInfo);
             accountConn.Connect();
 
-            //var allAlbs = GAPIAlbumsList.GetAllAlbums(accountConn.AccessToken);
-            //Logger.WriteToLog($"All albums total count: {allAlbs.albums.Count.ToString()}");
+            var allAlbs = GAPIAlbumsList.GetAllAlbums(accountConn.AccessToken);
+            Logger.Info($"All albums total count: {allAlbs.albums.Count.ToString()}");
             //GAPIAlbum.GetAlbum(accountConn.AccessToken, "ALRvDKd8KyuLfNh6EL0ZUQB1bmO_nOAEdj0hxnJ1_f_Jxo2LJ3qu05qiqWd7cZVZyZOoZAsGbitZ");
 
-            UploadFolderToAlbum(accountConn, new DirectoryInfo("/temp/Greenpark"));
+            //UploadFolderToAlbum(accountConn, new DirectoryInfo("/temp/19xx/199x_Gympl_scan"));
 
-            Logger.WriteToLog();
+            Logger.Info();
 
             Console.WriteLine("Process finished. Press Enter.......");
             Console.ReadLine();
@@ -60,6 +60,8 @@ namespace TestConsole
                 fileNames.Add(f.FullName);
             }
 
+            fileNames.Sort();
+
             var fileTokens = accountConn.UploadFiles(fileNames);
 
             if (fileTokens != null)
@@ -69,7 +71,7 @@ namespace TestConsole
             }
             else
             {
-                Logger.WriteToLog("Upload failed - empty fileTokens");
+                Logger.Error("Upload failed - empty fileTokens");
             }
         }
     }

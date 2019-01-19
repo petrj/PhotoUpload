@@ -12,7 +12,7 @@ namespace GAPI
         public string productUrl { get; set; }
         public bool isWriteable { get; set; }
 
-        GAPIShareInfo shareInfo { get; set; } = new GAPIShareInfo();
+        public GAPIShareInfo shareInfo { get; set; } = new GAPIShareInfo();
 
         public string mediaItemsCount { get; set; }
         public string coverPhotoBaseUrl { get; set; }
@@ -20,6 +20,8 @@ namespace GAPI
 
         public static GAPIAlbum CreateAlbum(GAPIAccessToken token, string albumTitle)
         {
+            Logger.Info($"Creating album {albumTitle}");
+
             // https://developers.google.com/photos/library/reference/rest/v1/albums/create
 
             try
@@ -37,13 +39,15 @@ namespace GAPI
             }
             catch (WebException ex)
             {
-                Logger.WriteToLog(ex);
+                Logger.Error(ex);
                 throw;
             }
         }
 
         public static GAPIAlbum GetAlbum(GAPIAccessToken token, string id)
         {
+            Logger.Info($"Geting album id {id}");
+
             // https://developers.google.com/photos/library/reference/rest/v1/albums/list
 
             var idFix = WebUtility.UrlEncode(id);
@@ -53,13 +57,13 @@ namespace GAPI
 
                 var alb = GAPIAccountConnection.SendRequest<GAPIAlbum>(url, null, "GET", token.access_token);
 
-                Logger.WriteToLog(alb.ToString());
+                Logger.Info(alb.ToString());
 
                 return alb;
             }
             catch (WebException ex)
             {
-                Logger.WriteToLog(ex);
+                Logger.Error(ex);
                 throw;
             }
         }
@@ -74,6 +78,8 @@ namespace GAPI
         /// <returns></returns>
         public static GAPINewMediaItemResults AddMediaItemsToAlbum(GAPIAccessToken token, string albumId, Dictionary<string,string> items)
         {
+            Logger.Info($"Addding media items to album id {albumId}");
+
             // https://developers.google.com/photos/library/reference/rest/v1/mediaItems/batchCreate
 
             var url = "https://photoslibrary.googleapis.com/v1/mediaItems:batchCreate";
@@ -94,13 +100,13 @@ namespace GAPI
             {
                 var newMediaItemResults = GAPIAccountConnection.SendRequest<GAPINewMediaItemResults>(url, newMediaItems, token.access_token);
 
-                Logger.WriteToLog(newMediaItemResults.ToString());
+                Logger.Info(newMediaItemResults.ToString());
 
                 return newMediaItemResults;
             }
             catch (WebException ex)
             {
-                Logger.WriteToLog(ex);
+                Logger.Error(ex);
                 throw;
             }
         }
