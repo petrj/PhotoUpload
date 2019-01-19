@@ -133,8 +133,10 @@ namespace GAPI
                 postData += $"&client_secret={AuthInfo.client_secret}";
                 postData += $"&grant_type=refresh_token";
 
-                AccessToken = SendRequest<GAPIAccessToken>(url, postData, "POST");
-                AccessToken.expires_at = DateTime.Now.AddSeconds(Convert.ToDouble(AccessToken.expires_in));
+                var refreshedAccessToken = SendRequest<GAPIAccessToken>(url, postData, "POST");
+
+                AccessToken.access_token = refreshedAccessToken.access_token;
+                AccessToken.expires_at = DateTime.Now.AddSeconds(Convert.ToDouble(refreshedAccessToken.expires_in));
 
                 AccessToken.SaveToFile("token.json");
             }
@@ -144,7 +146,6 @@ namespace GAPI
                 throw;
             }
         }
-
 
         public static T SendRequest<T>(string url,
                 GAPIBaseObject obj,
@@ -156,11 +157,10 @@ namespace GAPI
         /// <summary>
         /// Sends the request.
         /// </summary>
-        /// <returns>The request.</returns>
+        /// <returns>Response string</returns>
         /// <param name="request">Request.</param>
-        /// <param name="data">POST Data</param>
+        /// <param name="ASCIIPOSTdata">POST Data</param>
         /// <param name="accessToken">Access token.</param>
-        /// <typeparam name="T">The 1st type parameter.</typeparam>
         private static string SendRequestBase(HttpWebRequest request,
                string ASCIIPOSTdata,
                string accessToken = null)

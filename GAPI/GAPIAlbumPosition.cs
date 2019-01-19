@@ -8,7 +8,8 @@ namespace GAPI
 {
     public class GAPIAlbumPosition : GAPIBaseObject
     {
-        public GAPIPositionType position { get; set; } = GAPIPositionType.LAST_IN_ALBUM;
+        //public GAPIPositionType position { get; set; } = GAPIPositionType.LAST_IN_ALBUM;
+        public string position { get; set; } = "LAST_IN_ALBUM";
         public string relativeMediaItemId { get; set; }
         public string relativeEnrichmentItemId { get; set; }
     }
