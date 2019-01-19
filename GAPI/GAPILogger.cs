@@ -38,6 +38,11 @@ namespace GAPI
             _logger.Error(message);
         }
 
+        public static void Warning(string message)
+        {
+            _logger.Warn(message);
+        }
+
         public static void Debug(string message)
         {
             _logger.Debug(message);

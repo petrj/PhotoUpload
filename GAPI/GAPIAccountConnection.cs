@@ -306,6 +306,7 @@ namespace GAPI
                     }
                 }
 
+                Logger.Info("Posting file data");
                 var responseString = SendRequestBase(request, null, AccessToken.access_token);
 
                 return responseString;               

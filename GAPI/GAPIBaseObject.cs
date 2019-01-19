@@ -25,6 +25,7 @@ namespace GAPI
 
         public void SaveToFile(string name)
         {
+
             if (!Path.IsPathRooted(name))
             {
                 name = AppDataDir + name;

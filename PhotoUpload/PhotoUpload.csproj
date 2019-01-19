@@ -39,6 +39,9 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="PhotoUpload.cs" />
+    <Compile Include="UploadedJournal.cs" />
+    <Compile Include="JournalItem.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\GAPI\GAPI.csproj">
