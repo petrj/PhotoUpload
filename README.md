@@ -13,6 +13,7 @@ CLI Application for uploading media to Google Photo
 
 	In the same directory as PhotoUpload.exe must be file authInfo.json:
 
+	```
 	{
 	  "client_id": "xxxxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.apps.googleusercontent.com",
 	  "client_secret": "xxxxxxxxxxxxxxxxxxxxxxxx",
@@ -22,6 +23,9 @@ CLI Application for uploading media to Google Photo
 	    "https://www.googleapis.com/auth/photoslibrary.readonly.appcreateddata",
 	    ]
 	}
+	```
+	
+- Recurse uploading
 
 - Already uploaded directories are stored in journal.json
 
@@ -29,4 +33,4 @@ CLI Application for uploading media to Google Photo
 
 - Building:
 
-	msbuild
+	`msbuild PhotoUpload.sln`
