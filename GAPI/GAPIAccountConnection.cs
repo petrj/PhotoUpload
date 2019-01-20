@@ -5,6 +5,7 @@ using System.Net;
 using GAPI;
 using System.IO;
 using System.Text;
+using System.Globalization;
 
 namespace GAPI
 {
@@ -277,6 +278,33 @@ namespace GAPI
             return result;
         }
 
+        // https://stackoverflow.com/questions/249087/how-do-i-remove-diacritics-accents-from-a-string-in-net
+        public static string NormalizeStringForUrl(string name)
+        {
+            String normalizedString = name.Normalize(NormalizationForm.FormD);
+            StringBuilder stringBuilder = new StringBuilder();
+
+            foreach (char c in normalizedString)
+            {
+                switch (CharUnicodeInfo.GetUnicodeCategory(c))
+                {
+                    case UnicodeCategory.LowercaseLetter:
+                    case UnicodeCategory.UppercaseLetter:
+                    case UnicodeCategory.DecimalDigitNumber:
+                        stringBuilder.Append(c);
+                        break;
+                    case UnicodeCategory.SpaceSeparator:
+                    case UnicodeCategory.ConnectorPunctuation:
+                    case UnicodeCategory.DashPunctuation:
+                        stringBuilder.Append('_');
+                        break;
+                }
+            }
+            string result = stringBuilder.ToString();
+            return String.Join("_", result.Split(new char[] { '_' }
+                , StringSplitOptions.RemoveEmptyEntries)); // remove duplicate underscores
+        }
+
         public string UploadFile(string fileName)
         {
             try
@@ -291,7 +319,10 @@ namespace GAPI
 
                 request.Method = "POST";
                 request.ContentType = "application/octet-stream";
-                request.Headers["X-Goog-Upload-File-Name"] = Path.GetFileName(fileName);
+
+                var fNameValidForHeader = NormalizeStringForUrl(Path.GetFileNameWithoutExtension(fileName)) +
+                    "." + NormalizeStringForUrl(Path.GetExtension(fileName));
+                request.Headers["X-Goog-Upload-File-Name"] = fNameValidForHeader; // non ascii characters cause "System.ArgumentException: Specified value has invalid CRLF characters."
                 request.Headers["X-Goog-Upload-Protocol"] = "raw";
 
                 // fill request stream buffer with file

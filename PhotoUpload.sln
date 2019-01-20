@@ -21,7 +21,6 @@ Global
 		{5C3F74E3-03EB-4450-9C12-8FDECD6C905C}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		BaseDirectory = .
 		Policies = $0
 		$0.DotNetNamingPolicy = $1
 		$1.DirectoryNamespaceAssociation = PrefixedHierarchical
@@ -30,5 +29,6 @@ Global
 		$2.TabsToSpaces = True
 		$2.scope = text/plain
 		$0.StandardHeader = $3
+		version = 0.6
 	EndGlobalSection
 EndGlobal
