@@ -10,7 +10,7 @@ namespace GAPI
         public List<GAPIAlbum> albums { get; set; } = new List<GAPIAlbum>();
         public string nextPageToken { get; set; }
 
-        public static GAPIAlbumsList GetAllAlbums(GAPIAccessToken token)
+        public static GAPIAlbumsList GetAllAlbums(GAPIAccountConnection conn)
         {
             var result = new GAPIAlbumsList();
 
@@ -18,7 +18,7 @@ namespace GAPI
 
             do
             {
-                var albums = GetAlbums(token, 50, pageToken);
+                var albums = GetAlbums(conn, 50, pageToken);
 
                 result.albums.AddRange(albums.albums);
 
@@ -29,7 +29,7 @@ namespace GAPI
             return result;
         }
 
-        public static GAPIAlbumsList GetAlbums(GAPIAccessToken token, int pageSize = 20, string pageToken = null)
+        public static GAPIAlbumsList GetAlbums(GAPIAccountConnection conn, int pageSize = 20, string pageToken = null)
         {
             // https://developers.google.com/photos/library/reference/rest/v1/albums/list
 
@@ -44,7 +44,7 @@ namespace GAPI
                     url += $"&pageToken={pageToken}";
                 }
 
-                return GAPIAccountConnection.SendRequest<GAPIAlbumsList>(url, null , "GET", token.access_token);
+                return GAPIAccountConnection.SendRequest<GAPIAlbumsList>(url, null , "GET", conn);
             }
 
             catch (WebException ex)

@@ -38,7 +38,6 @@ namespace PhotoUpload
             var photoUpload = new PhotoUpload();
             photoUpload.Connect();
 
-            //photoUpload.UploadFolderToAlbum(new DirectoryInfo("/temp/PATHFIND"));
             photoUpload.UploadFolders(new DirectoryInfo(args[0]));
 
             Logger.Info();

@@ -18,7 +18,7 @@ namespace GAPI
         public string coverPhotoBaseUrl { get; set; }
         public string coverPhotoMediaItemId { get; set; }
 
-        public static GAPIAlbum CreateAlbum(GAPIAccessToken token, string albumTitle)
+        public static GAPIAlbum CreateAlbum(GAPIAccountConnection conn, string albumTitle)
         {
             Logger.Info($"Creating album {albumTitle}");
 
@@ -35,7 +35,7 @@ namespace GAPI
 
                 newAlbum.SaveToFile("newAlbum.json");
 
-                return GAPIAccountConnection.SendRequest<GAPIAlbum>(url, newAlbum, token.access_token);
+                return GAPIAccountConnection.SendRequest<GAPIAlbum>(url, newAlbum, conn);
             }
             catch (WebException ex)
             {
@@ -44,7 +44,7 @@ namespace GAPI
             }
         }
 
-        public static GAPIAlbum GetAlbum(GAPIAccessToken token, string id)
+        public static GAPIAlbum GetAlbum(GAPIAccountConnection conn, string id)
         {
             Logger.Info($"Geting album id {id}");
 
@@ -55,11 +55,30 @@ namespace GAPI
             {
                 var url = $"https://photoslibrary.googleapis.com/v1/albums/{idFix}";
 
-                var alb = GAPIAccountConnection.SendRequest<GAPIAlbum>(url, null, "GET", token.access_token);
+                var alb = GAPIAccountConnection.SendRequest<GAPIAlbum>(url, null, "GET", conn);
 
                 Logger.Info(alb.ToString());
 
                 return alb;
+            }
+            catch (WebException ex)
+            {
+                Logger.Error(ex);
+                throw;
+            }
+        }
+
+        public static GAPINewMediaItemResults AddMediaItemToAlbum(GAPIAccountConnection conn, string albumId, string fileName)
+        {
+            Logger.Info($"Addding media item (file {fileName}) to album id {albumId}");
+
+            try
+            {
+                var fileToken = conn.UploadFile(fileName);
+
+                var mediaItems = new Dictionary<string, string>() { { fileToken, fileName } };
+
+                return AddMediaItemsToAlbum(conn, albumId, mediaItems);
             }
             catch (WebException ex)
             {
@@ -76,7 +95,7 @@ namespace GAPI
         /// Value .. item description
         /// </param>
         /// <returns></returns>
-        public static GAPINewMediaItemResults AddMediaItemsToAlbum(GAPIAccessToken token, string albumId, Dictionary<string,string> items)
+        public static GAPINewMediaItemResults AddMediaItemsToAlbum(GAPIAccountConnection conn, string albumId, Dictionary<string,string> items)
         {
             Logger.Info($"Addding media items to album id {albumId}");
 
@@ -98,7 +117,7 @@ namespace GAPI
 
             try
             {
-                var newMediaItemResults = GAPIAccountConnection.SendRequest<GAPINewMediaItemResults>(url, newMediaItems, token.access_token);
+                var newMediaItemResults = GAPIAccountConnection.SendRequest<GAPINewMediaItemResults>(url, newMediaItems, conn);
 
                 Logger.Info(newMediaItemResults.ToString());
 

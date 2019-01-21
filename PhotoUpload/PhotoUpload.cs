@@ -9,17 +9,17 @@ namespace PhotoUpload
 {
     public class PhotoUpload
     {
-        public List<string> AllowedExtensions { get; set; } = new List<string>() { 
-            ".jpg" , 
-            ".jpeg", 
-            ".jpgrd", 
-            ".png", 
-            ".bmp", 
-            ".gif", 
-            ".avi", 
-            ".mp4", 
-            ".m4v", 
-            ".3gp", 
+        public List<string> AllowedExtensions { get; set; } = new List<string>() {
+            ".jpg" ,
+            ".jpeg",
+            ".jpgrd",
+            ".png",
+            ".bmp",
+            ".gif",
+            ".avi",
+            ".mp4",
+            ".m4v",
+            ".3gp",
             ".mov" };
 
         private UploadedJournal _uploadedJournal = new UploadedJournal();
@@ -52,7 +52,7 @@ namespace PhotoUpload
 
         public bool Connect()
         {
-            var res = true;           
+            var res = true;
 
             if (File.Exists(AuthInfoPath))
             {
@@ -155,7 +155,7 @@ namespace PhotoUpload
 
             //  create album
 
-            var alb = GAPIAlbum.CreateAlbum(_accountConnection.AccessToken, directory.Name);
+            var alb = GAPIAlbum.CreateAlbum(_accountConnection, directory.Name);
 
             // batch upload
             var batchCount = 20;
@@ -202,7 +202,7 @@ namespace PhotoUpload
             {
                 foreach (var batch in fileTokensBatch)
                 {
-                    var uploadedItems = GAPIAlbum.AddMediaItemsToAlbum(_accountConnection.AccessToken, alb.id, batch);
+                    var uploadedItems = GAPIAlbum.AddMediaItemsToAlbum(_accountConnection, alb.id, batch);
                 }
 
                 AddToJournal(directory.FullName, Guid.NewGuid().ToString());

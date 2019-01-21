@@ -47,7 +47,7 @@ namespace GAPI
             {
                 Logger.Info("Access token does not exist");
 
-                Authenticate(); 
+                Authenticate();
             }
 
             Logger.Info($"Access token will expire at [{AccessToken.expires_at.ToString()}]");
@@ -155,9 +155,9 @@ namespace GAPI
 
         public static T SendRequest<T>(string url,
                 GAPIBaseObject obj,
-                string accessToken = null)
+                GAPIAccountConnection conn)
         {
-            return SendRequest<T>(url, JsonConvert.SerializeObject(obj), "POST", accessToken, "application/json");
+            return SendRequest<T>(url, JsonConvert.SerializeObject(obj), "POST", conn, "application/json");
         }
 
         /// <summary>
@@ -166,10 +166,10 @@ namespace GAPI
         /// <returns>Response string</returns>
         /// <param name="request">Request.</param>
         /// <param name="ASCIIPOSTdata">POST Data</param>
-        /// <param name="accessToken">Access token.</param>
+        /// <param name="conn">Initialized GAPIAccountConnection</param>
         private static string SendRequestBase(HttpWebRequest request,
                string ASCIIPOSTdata,
-               string accessToken = null)
+               GAPIAccountConnection conn = null)
         {
             if (request.Method == "GET")
             {
@@ -197,16 +197,22 @@ namespace GAPI
 
             Logger.Info($"ContentType: {request.ContentType}");
 
-            if (!String.IsNullOrEmpty(accessToken))
+            if (conn != null)
             {
-                accessToken = WebUtility.UrlEncode(accessToken);
+                if (conn.AccessToken.expires_at<DateTime.Now)
+                {
+                    Logger.Info($"Access token expired at [{conn.AccessToken.expires_at.ToString()}]");
+                    conn.RefreshAccessToken();
+                }
+
+                var accessToken = WebUtility.UrlEncode(conn.AccessToken.access_token);
                 request.Headers.Add("Authorization", "Bearer " + accessToken);
                 request.PreAuthenticate = true;
             }
 
             if (request.Method == "POST" && ASCIIPOSTdata != null)
             {
-                // adding post data 
+                // adding post data
 
                 var postData = string.IsNullOrEmpty(ASCIIPOSTdata)
                 ? new byte[0]
@@ -248,7 +254,7 @@ namespace GAPI
         public static T SendRequest<T>(string url,
                 string data,
                 string method,
-                string accessToken = null,
+                GAPIAccountConnection conn = null,
                 string contentType = "application/x-www-form-urlencoded")
         {
             var request = (HttpWebRequest)WebRequest.Create(url);
@@ -257,7 +263,7 @@ namespace GAPI
             request.ContentType = contentType;
             request.Accept = "application/json";
 
-            var responseString = SendRequestBase(request, data, accessToken);
+            var responseString = SendRequestBase(request, data, conn);
 
             return JsonConvert.DeserializeObject<T>(responseString);
         }
@@ -338,9 +344,9 @@ namespace GAPI
                 }
 
                 Logger.Info("Posting file data");
-                var responseString = SendRequestBase(request, null, AccessToken.access_token);
+                var responseString = SendRequestBase(request, null, this);
 
-                return responseString;               
+                return responseString;
 
             } catch (Exception ex)
             {
