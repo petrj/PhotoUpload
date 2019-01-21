@@ -30,12 +30,24 @@ namespace GAPI
 
         public static void Error(Exception ex)
         {
-            _logger.Error(ex.ToString());
+            Error(null, ex);
         }
 
-        public static void Error(string message)
+        public static void Error(string message, Exception ex = null)
         {
-            _logger.Error(message);
+            if ((ex != null ) && (ex is WebException))
+            {
+                if ((ex as WebException).Status == WebExceptionStatus.ProtocolError)
+                {
+                    var response = (ex as WebException).Response as HttpWebResponse;
+                    if (response != null)
+                    {
+                        message += $" Status code: {(int)response.StatusCode}";
+                    }
+                }
+            }
+
+            _logger.Error(ex, message);
         }
 
         public static void Warning(string message)

@@ -12,21 +12,29 @@ namespace GAPI
 
         public static GAPIAlbumsList GetAllAlbums(GAPIAccountConnection conn)
         {
-            var result = new GAPIAlbumsList();
-
-            string pageToken = null;
-
-            do
+            try
             {
-                var albums = GetAlbums(conn, 50, pageToken);
+                var result = new GAPIAlbumsList();
 
-                result.albums.AddRange(albums.albums);
+                string pageToken = null;
 
-                pageToken = albums.nextPageToken;
+                do
+                {
+                    var albums = GetAlbums(conn, 50, pageToken);
 
-            } while (pageToken != null);
+                    result.albums.AddRange(albums.albums);
 
-            return result;
+                    pageToken = albums.nextPageToken;
+
+                } while (pageToken != null);
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex);
+                throw;
+            }
         }
 
         public static GAPIAlbumsList GetAlbums(GAPIAccountConnection conn, int pageSize = 20, string pageToken = null)
@@ -46,8 +54,7 @@ namespace GAPI
 
                 return GAPIAccountConnection.SendRequest<GAPIAlbumsList>(url, null , "GET", conn);
             }
-
-            catch (WebException ex)
+            catch (Exception ex)
             {
                 Logger.Error(ex);
                 throw;

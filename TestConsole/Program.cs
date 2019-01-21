@@ -42,9 +42,8 @@ namespace TestConsole
 
             //accountConnection.RefreshAccessToken();
             //var albs = GAPIAlbumsList.GetAllAlbums(accountConnection);
-            var newAlb = GAPIAlbum.CreateAlbum(accountConnection, "Album Y");
-            var newItems = GAPIAlbum.AddMediaItemToAlbum(accountConnection, newAlb.id, @"C:\GoogleDrive\Foto\Verunka-double-dy-em.jpg");
-
+            // var newAlb = GAPIAlbum.CreateAlbum(accountConnection, "Album Y");
+            //var newItems = GAPIAlbum.AddMediaItemToAlbum(accountConnection, "non existing alb", @"C:\temp\file.jpg");
 
             Console.WriteLine("Process finished. <ENTER>");
             Console.ReadLine();

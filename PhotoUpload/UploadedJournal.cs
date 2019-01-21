@@ -7,9 +7,9 @@ namespace PhotoUpload
 {
     public class UploadedJournal : GAPIBaseObject
     {
-        public List<JournalItem> Albums { get; set; } = new List<JournalItem>();
+        public List<UploadedJournalItem> Albums { get; set; } = new List<UploadedJournalItem>();
 
-        public JournalItem Directory(string directoryName)
+        public UploadedJournalItem Directory(string directoryName)
         {
             foreach (var alb in Albums)
             {

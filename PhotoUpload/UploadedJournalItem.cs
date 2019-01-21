@@ -3,7 +3,7 @@ using GAPI;
 
 namespace PhotoUpload
 {
-    public class JournalItem : GAPIBaseObject
+    public class UploadedJournalItem : GAPIBaseObject
     {
         public string DirectoryName { get; set; }
         public string AlbumId { get; set; }

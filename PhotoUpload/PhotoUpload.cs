@@ -52,164 +52,197 @@ namespace PhotoUpload
 
         public bool Connect()
         {
-            var res = true;
+            try
+            {
+                var res = true;
 
-            if (File.Exists(AuthInfoPath))
-            {
-                _authInfo = GAPIBaseObject.LoadFromFile<GAPIClientAuthorizationInfo>(AuthInfoPath);
-            }
-            else
-            {
-                Logger.Info($"Missing {AuthInfoPath}");
-                res = false;
-            }
+                if (File.Exists(AuthInfoPath))
+                {
+                    _authInfo = GAPIBaseObject.LoadFromFile<GAPIClientAuthorizationInfo>(AuthInfoPath);
+                }
+                else
+                {
+                    Logger.Info($"Missing {AuthInfoPath}");
+                    res = false;
+                }
 
-            if (File.Exists(JournalPath))
-            {
-               _uploadedJournal = GAPIBaseObject.LoadFromFile<UploadedJournal>(JournalPath);
-            }
-            else
-            {
-                Logger.Debug($"Missing {JournalPath}");
-            }
+                if (File.Exists(JournalPath))
+                {
+                    _uploadedJournal = GAPIBaseObject.LoadFromFile<UploadedJournal>(JournalPath);
+                }
+                else
+                {
+                    Logger.Debug($"Missing {JournalPath}");
+                }
 
-            if (res)
-            {
-                _accountConnection = new GAPIAccountConnection(_authInfo);
-                _accountConnection.Connect();
-            }
+                if (res)
+                {
+                    _accountConnection = new GAPIAccountConnection(_authInfo);
+                    _accountConnection.Connect();
+                }
 
-            return res;
+                return res;
+
+            } catch (Exception ex)
+            {
+                Logger.Error(ex);
+                throw;
+            }
         }
 
         public void AddToJournal(string directoryName, string albumId)
         {
-            var alb = _uploadedJournal.Directory(directoryName);
-            if (alb == null)
+            try
             {
-                Logger.Info($"Adding folder {directoryName} to journal (id {albumId})");
-
-                _uploadedJournal.Albums.Add(new JournalItem()
+                var alb = _uploadedJournal.Directory(directoryName);
+                if (alb == null)
                 {
-                    DirectoryName = directoryName,
-                    AlbumId = albumId
-                });
+                    Logger.Info($"Adding folder {directoryName} to journal (id {albumId})");
 
-                _uploadedJournal.SaveToFile(JournalPath);
+                    _uploadedJournal.Albums.Add(new UploadedJournalItem()
+                    {
+                        DirectoryName = directoryName,
+                        AlbumId = albumId
+                    });
+
+                    _uploadedJournal.SaveToFile(JournalPath);
+                }
+                else
+                {
+                    Logger.Info($"Folder {directoryName} is already in journal with {albumId}");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                Logger.Info($"Folder {directoryName} is already in journal with {albumId}");
+                Logger.Error(ex);
+                throw;
             }
         }
 
         public void UploadFolders(DirectoryInfo directory)
         {
-            Logger.Info($"Uploading all folders from {directory.Name}");
-
-            // uploading self
-            UploadFolderToAlbum(directory);
-
-            var allDirs = directory.GetDirectories("*.*", SearchOption.AllDirectories);
-
-            var dirs = new List<string>();
-            foreach (var dir in allDirs)
+            try
             {
-                dirs.Add(dir.FullName);
+
+                Logger.Info($"Uploading all folders from {directory.Name}");
+
+                // uploading self
+                UploadFolderToAlbum(directory);
+
+                var allDirs = directory.GetDirectories("*.*", SearchOption.AllDirectories);
+
+                var dirs = new List<string>();
+                foreach (var dir in allDirs)
+                {
+                    dirs.Add(dir.FullName);
+                }
+
+                dirs.Sort();
+
+                foreach (var dir in dirs)
+                {
+                    UploadFolderToAlbum(new DirectoryInfo(dir));
+                }
             }
-
-            dirs.Sort();
-
-            foreach (var dir in dirs)
+            catch (Exception ex)
             {
-                UploadFolderToAlbum(new DirectoryInfo(dir));
+                Logger.Error(ex);
+                throw;
             }
         }
 
         public void UploadFolderToAlbum(DirectoryInfo directory)
         {
-            Logger.Info($"Uploading folder {directory.Name}");
-
-            // looking in journal
-            var alreadyUploadedJournalItem = _uploadedJournal.Directory(directory.FullName);
-            if (alreadyUploadedJournalItem != null)
+            try
             {
-                Logger.Warning($"Folder {directory.FullName} is already uploaded with id {alreadyUploadedJournalItem.AlbumId}");
-                return;
-            }
+                Logger.Info($"Uploading folder {directory.Name}");
 
-            //Logger.Info($"Searching all files in {directory.Name}");
-
-            // https://stackoverflow.com/questions/7039580/multiple-file-extensions-searchpattern-for-system-io-directory-getfiles/7039649
-            var files = Directory.GetFiles(directory.FullName, "*.*", SearchOption.TopDirectoryOnly)
-            .Where(f => AllowedExtensions.Contains(Path.GetExtension(f).ToLower())).ToList();
-
-            Logger.Info($"Files found: {files.Count}");
-
-            if (files.Count == 0)
-            {
-                return;
-            }
-
-            files.Sort();
-
-            //  create album
-
-            var alb = GAPIAlbum.CreateAlbum(_accountConnection, directory.Name);
-
-            // batch upload
-            var batchCount = 20;
-
-            var fileTokensBatch = new List<Dictionary<string,string>>();
-
-            var actualBatch = new Dictionary<string, string>();
-
-            var fIndex = 0;
-            foreach (var f in files)
-            {
-                Logger.Info($"Uploading file {f}");
-
-                //  upload file
-                string uploadToken = _accountConnection.UploadFile(f);
-
-                if (string.IsNullOrEmpty(uploadToken))
+                // looking in journal
+                var alreadyUploadedJournalItem = _uploadedJournal.Directory(directory.FullName);
+                if (alreadyUploadedJournalItem != null)
                 {
-                    Logger.Warning($"Empty upload file token for file ({f})");
+                    Logger.Warning($"Folder {directory.FullName} is already uploaded with id {alreadyUploadedJournalItem.AlbumId}");
+                    return;
+                }
+
+                //Logger.Info($"Searching all files in {directory.Name}");
+
+                // https://stackoverflow.com/questions/7039580/multiple-file-extensions-searchpattern-for-system-io-directory-getfiles/7039649
+                var files = Directory.GetFiles(directory.FullName, "*.*", SearchOption.TopDirectoryOnly)
+                .Where(f => AllowedExtensions.Contains(Path.GetExtension(f).ToLower())).ToList();
+
+                Logger.Info($"Files found: {files.Count}");
+
+                if (files.Count == 0)
+                {
+                    return;
+                }
+
+                files.Sort();
+
+                //  create album
+
+                var alb = GAPIAlbum.CreateAlbum(_accountConnection, directory.Name);
+
+                // batch upload
+                var batchCount = 20;
+
+                var fileTokensBatch = new List<Dictionary<string, string>>();
+
+                var actualBatch = new Dictionary<string, string>();
+
+                var fIndex = 0;
+                foreach (var f in files)
+                {
+                    Logger.Info($"Uploading file {f}");
+
+                    //  upload file
+                    string uploadToken = _accountConnection.UploadFile(f);
+
+                    if (string.IsNullOrEmpty(uploadToken))
+                    {
+                        Logger.Warning($"Empty upload file token for file ({f})");
+                    }
+                    else
+                    {
+                        actualBatch.Add(uploadToken, Path.GetFileName(f));
+                    }
+
+                    fIndex++;
+                    if (fIndex > batchCount)
+                    {
+                        if (actualBatch.Count > 0)
+                        {
+                            actualBatch = new Dictionary<string, string>();
+                            fileTokensBatch.Add(actualBatch);
+                        }
+                        fIndex = 0;
+                    }
+                }
+
+                if (actualBatch.Count > 0)
+                {
+                    fileTokensBatch.Add(actualBatch);
+                }
+
+                if (fileTokensBatch.Count > 0)
+                {
+                    foreach (var batch in fileTokensBatch)
+                    {
+                        var uploadedItems = GAPIAlbum.AddMediaItemsToAlbum(_accountConnection, alb.id, batch);
+                    }
+
+                    AddToJournal(directory.FullName, Guid.NewGuid().ToString());
                 }
                 else
                 {
-                    actualBatch.Add(uploadToken, Path.GetFileName(f));
-                }
-
-                fIndex++;
-                if (fIndex > batchCount)
-                {
-                    if (actualBatch.Count > 0)
-                    {
-                        actualBatch = new Dictionary<string, string>();
-                        fileTokensBatch.Add(actualBatch);
-                    }
-                    fIndex = 0;
+                    Logger.Info($"No file uploaded");
                 }
             }
-
-            if (actualBatch.Count > 0)
+            catch (Exception ex)
             {
-                fileTokensBatch.Add(actualBatch);
-            }
-
-            if (fileTokensBatch.Count > 0)
-            {
-                foreach (var batch in fileTokensBatch)
-                {
-                    var uploadedItems = GAPIAlbum.AddMediaItemsToAlbum(_accountConnection, alb.id, batch);
-                }
-
-                AddToJournal(directory.FullName, Guid.NewGuid().ToString());
-            }
-            else
-            {
-                Logger.Info($"No file uploaded");
+                Logger.Error(ex);
+                throw;
             }
         }
     }

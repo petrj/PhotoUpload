@@ -21,54 +21,71 @@ namespace GAPI
 
         public void Connect()
         {
-            var tokenPath = $"{GAPIBaseObject.AppDataDir}token.json";
-
-            if (File.Exists(tokenPath))
+            try
             {
-                AccessToken = GAPIBaseObject.LoadFromFile<GAPIAccessToken>("token.json");
 
-                if (string.IsNullOrEmpty(AccessToken.refresh_token))
+                var tokenPath = $"{GAPIBaseObject.AppDataDir}token.json";
+
+                if (File.Exists(tokenPath))
                 {
-                    Logger.Info("Empty refresh token");
+                    AccessToken = GAPIBaseObject.LoadFromFile<GAPIAccessToken>("token.json");
 
-                    Authenticate();
+                    if (string.IsNullOrEmpty(AccessToken.refresh_token))
+                    {
+                        Logger.Info("Empty refresh token");
+
+                        Authenticate();
+                    }
+                    else
+                    {
+                        if (AccessToken.expires_at < DateTime.Now)
+                        {
+                            Logger.Info($"Access token expired at [{AccessToken.expires_at.ToString()}]");
+
+                            RefreshAccessToken();
+                        }
+                    }
                 }
                 else
                 {
-                    if (AccessToken.expires_at < DateTime.Now)
-                    {
-                        Logger.Info($"Access token expired at [{AccessToken.expires_at.ToString()}]");
+                    Logger.Info("Access token does not exist");
 
-                        RefreshAccessToken();
-                    }
+                    Authenticate();
                 }
+
+                Logger.Info($"Access token will expire at [{AccessToken.expires_at.ToString()}]");
             }
-            else
+            catch (Exception ex)
             {
-                Logger.Info("Access token does not exist");
-
-                Authenticate();
+                Logger.Error(ex);
+                throw;
             }
-
-            Logger.Info($"Access token will expire at [{AccessToken.expires_at.ToString()}]");
         }
 
         public void Authenticate()
         {
-            // authenticate user & user consent
-            Logger.Info("Authenticating user");
+            try
+            {
+                // authenticate user & user consent
+                Logger.Info("Authenticating user");
 
-            var browserUrl = GetUrlForAuthCode();
+                var browserUrl = GetUrlForAuthCode();
 
-            Console.WriteLine("Authorize on url:");
-            Console.WriteLine();
-            Console.WriteLine(browserUrl);
-            Console.WriteLine();
+                Console.WriteLine("Authorize on url:");
+                Console.WriteLine();
+                Console.WriteLine(browserUrl);
+                Console.WriteLine();
 
-            Console.Write("Paste auth code:");
-            var code = Console.ReadLine();
+                Console.Write("Paste auth code:");
+                var code = Console.ReadLine();
 
-            ReceiveAccessToken(code);
+                ReceiveAccessToken(code);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex);
+                throw;
+            }
         }
 
         public string GetUrlForAuthCode()
@@ -93,15 +110,15 @@ namespace GAPI
 
         public void ReceiveAccessToken(string code)
         {
-            Logger.Info("Receiving access token");
-
-            // https://developers.google.com/identity/protocols/OAuth2InstalledApp
-
-            var redirectURI = "urn:ietf:wg:oauth:2.0:oob";
-            code = WebUtility.UrlEncode(code);
-
             try
             {
+                Logger.Info("Receiving access token");
+
+                // https://developers.google.com/identity/protocols/OAuth2InstalledApp
+
+                var redirectURI = "urn:ietf:wg:oauth:2.0:oob";
+                code = WebUtility.UrlEncode(code);
+
                 var url = "https://www.googleapis.com/oauth2/v4/token";
 
                 string postData = $"code={code}";
@@ -110,7 +127,7 @@ namespace GAPI
                 postData += $"&redirect_uri={redirectURI}";
                 postData += $"&grant_type=authorization_code";
 
-                AccessToken = SendRequest<GAPIAccessToken>(url, postData,"POST", null);
+                AccessToken = SendRequest<GAPIAccessToken>(url, postData, "POST", null);
                 AccessToken.expires_at = DateTime.Now.AddSeconds(Convert.ToDouble(AccessToken.expires_in));
 
                 AccessToken.SaveToFile("token.json");
@@ -124,14 +141,14 @@ namespace GAPI
 
         public void RefreshAccessToken()
         {
-            Logger.Info("Refreshing access token");
-
-            // https://developers.google.com/identity/protocols/OAuth2InstalledApp
-
-            var refreshTokenFix = WebUtility.UrlEncode(AccessToken.refresh_token);
-
             try
             {
+                Logger.Info("Refreshing access token");
+
+                // https://developers.google.com/identity/protocols/OAuth2InstalledApp
+
+                var refreshTokenFix = WebUtility.UrlEncode(AccessToken.refresh_token);
+
                 var url = "https://www.googleapis.com/oauth2/v4/token";
 
                 string postData = $"refresh_token={AccessToken.refresh_token_urlencoded}";
@@ -171,84 +188,93 @@ namespace GAPI
                string ASCIIPOSTdata,
                GAPIAccountConnection conn = null)
         {
-            if (request.Method == "GET")
+            try
             {
-                Logger.Info($"Sending GET request to url: {request.RequestUri}");
-            }
-            else
-            {
-                Logger.Info($"Sending POST request to url: {request.RequestUri}");
 
-                if (request.ContentLength >= 0)
+                if (request.Method == "GET")
                 {
-                    Logger.Debug($"Request ContentLength: {request.ContentLength}");
+                    Logger.Info($"Sending GET request to url: {request.RequestUri}");
                 }
-
-                if (ASCIIPOSTdata != null)
+                else
                 {
-                    Logger.Debug($"Posting data length: {ASCIIPOSTdata.Length}");
+                    Logger.Info($"Sending POST request to url: {request.RequestUri}");
 
-                    if (request.ContentType != "application/octet-stream")
+                    if (request.ContentLength >= 0)
                     {
-                        Logger.Debug($"Posting data: {ASCIIPOSTdata}");
+                        Logger.Debug($"Request ContentLength: {request.ContentLength}");
+                    }
+
+                    if (ASCIIPOSTdata != null)
+                    {
+                        Logger.Debug($"Posting data length: {ASCIIPOSTdata.Length}");
+
+                        if (request.ContentType != "application/octet-stream")
+                        {
+                            Logger.Debug($"Posting data: {ASCIIPOSTdata}");
+                        }
                     }
                 }
-            }
 
-            Logger.Info($"ContentType: {request.ContentType}");
+                Logger.Info($"ContentType: {request.ContentType}");
 
-            if (conn != null)
-            {
-                if (conn.AccessToken.expires_at<DateTime.Now)
+                if (conn != null)
                 {
-                    Logger.Info($"Access token expired at [{conn.AccessToken.expires_at.ToString()}]");
-                    conn.RefreshAccessToken();
+                    if (conn.AccessToken.expires_at < DateTime.Now)
+                    {
+                        Logger.Info($"Access token expired at [{conn.AccessToken.expires_at.ToString()}]");
+                        conn.RefreshAccessToken();
+                    }
+
+                    var accessToken = WebUtility.UrlEncode(conn.AccessToken.access_token);
+                    request.Headers.Add("Authorization", "Bearer " + accessToken);
+                    request.PreAuthenticate = true;
                 }
 
-                var accessToken = WebUtility.UrlEncode(conn.AccessToken.access_token);
-                request.Headers.Add("Authorization", "Bearer " + accessToken);
-                request.PreAuthenticate = true;
-            }
-
-            if (request.Method == "POST" && ASCIIPOSTdata != null)
-            {
-                // adding post data
-
-                var postData = string.IsNullOrEmpty(ASCIIPOSTdata)
-                ? new byte[0]
-                : Encoding.ASCII.GetBytes(ASCIIPOSTdata);
-
-                request.ContentLength = ASCIIPOSTdata.Length;
-
-                using (var stream = request.GetRequestStream())
+                if (request.Method == "POST" && ASCIIPOSTdata != null)
                 {
-                    stream.Write(postData, 0, ASCIIPOSTdata.Length);
+                    // adding post data
+
+                    var postData = string.IsNullOrEmpty(ASCIIPOSTdata)
+                    ? new byte[0]
+                    : Encoding.ASCII.GetBytes(ASCIIPOSTdata);
+
+                    request.ContentLength = ASCIIPOSTdata.Length;
+
+                    using (var stream = request.GetRequestStream())
+                    {
+                        stream.Write(postData, 0, ASCIIPOSTdata.Length);
+                    }
                 }
+
+                Logger.Debug($"Method: {request.Method}");
+                Logger.Debug($"RequestUri: {request.RequestUri}");
+                Logger.Debug($"ContentType: {request.ContentType}");
+                Logger.Debug($"ContentLength: {request.ContentLength}");
+
+                foreach (var header in request.Headers)
+                {
+                    Logger.Debug($"Header: {header.ToString()}");
+                }
+
+                var response = (HttpWebResponse)request.GetResponse();
+
+                var responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();
+
+                Logger.Debug($"Response: {responseString}");
+                Logger.Debug($"StatusCode: {response.StatusCode}");
+                Logger.Debug($"StatusDescription: {response.StatusDescription}");
+
+                Logger.Debug($"ContentLength: {response.ContentLength}");
+                Logger.Debug($"ContentType: {response.ContentType}");
+                Logger.Debug($"ContentEncoding: {response.ContentEncoding}");
+
+                return responseString;
             }
-
-            Logger.Debug($"Method: {request.Method}");
-            Logger.Debug($"RequestUri: {request.RequestUri}");
-            Logger.Debug($"ContentType: {request.ContentType}");
-            Logger.Debug($"ContentLength: {request.ContentLength}");
-
-            foreach (var header in request.Headers)
+            catch (Exception ex)
             {
-                Logger.Debug($"Header: {header.ToString()}");
+                Logger.Error(ex);
+                throw;
             }
-
-            var response = (HttpWebResponse)request.GetResponse();
-
-            var responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();
-
-            Logger.Debug($"Response: {responseString}");
-            Logger.Debug($"StatusCode: {response.StatusCode}");
-            Logger.Debug($"StatusDescription: {response.StatusDescription}");
-
-            Logger.Debug($"ContentLength: {response.ContentLength}");
-            Logger.Debug($"ContentType: {response.ContentType}");
-            Logger.Debug($"ContentEncoding: {response.ContentEncoding}");
-
-            return responseString;
         }
 
         public static T SendRequest<T>(string url,
@@ -257,15 +283,23 @@ namespace GAPI
                 GAPIAccountConnection conn = null,
                 string contentType = "application/x-www-form-urlencoded")
         {
-            var request = (HttpWebRequest)WebRequest.Create(url);
+            try
+            {
+                var request = (HttpWebRequest)WebRequest.Create(url);
 
-            request.Method = method;
-            request.ContentType = contentType;
-            request.Accept = "application/json";
+                request.Method = method;
+                request.ContentType = contentType;
+                request.Accept = "application/json";
 
-            var responseString = SendRequestBase(request, data, conn);
+                var responseString = SendRequestBase(request, data, conn);
 
-            return JsonConvert.DeserializeObject<T>(responseString);
+                return JsonConvert.DeserializeObject<T>(responseString);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex);
+                throw;
+            }
         }
 
         /// <summary>

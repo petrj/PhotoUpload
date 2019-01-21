@@ -25,30 +25,43 @@ namespace GAPI
 
         public void SaveToFile(string name)
         {
-
-            if (!Path.IsPathRooted(name))
+            try
             {
-                name = AppDataDir + name;
+                if (!Path.IsPathRooted(name))
+                {
+                    name = AppDataDir + name;
+                }
+
+                File.WriteAllText(name, this.ToString());
+
+                Logger.Info($"Saved to file: {name}");
             }
-
-            File.WriteAllText(name, this.ToString());
-
-            Logger.Info($"Saved to file: {name}");
+            catch (Exception ex)
+            {
+                Logger.Error(ex);
+                throw;
+            }
         }
 
         public static T LoadFromFile<T>(string name)
         {
-            if (!Path.IsPathRooted(name))
+            try
             {
-                name = AppDataDir + name;
+                if (!Path.IsPathRooted(name))
+                {
+                    name = AppDataDir + name;
+                }
+                string s = File.ReadAllText(name);
+
+                var obj = JsonConvert.DeserializeObject<T>(s);
+
+                return obj;
             }
-            string s = File.ReadAllText(name);
-
-            var obj = JsonConvert.DeserializeObject<T>(s);
-
-            //return (T) Convert.ChangeType(obj, typeof(T));
-
-            return obj;
+            catch (Exception ex)
+            {
+                Logger.Error(ex);
+                throw;
+            }
         }
 
         public override string ToString()
