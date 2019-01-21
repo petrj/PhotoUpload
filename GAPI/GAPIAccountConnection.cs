@@ -249,7 +249,10 @@ namespace GAPI
                 Logger.Debug($"Method: {request.Method}");
                 Logger.Debug($"RequestUri: {request.RequestUri}");
                 Logger.Debug($"ContentType: {request.ContentType}");
-                Logger.Debug($"ContentLength: {request.ContentLength}");
+                if (request.ContentLength >0)
+                {
+                    Logger.Debug($"ContentLength: {request.ContentLength}");
+                }
 
                 foreach (var header in request.Headers)
                 {
@@ -377,7 +380,7 @@ namespace GAPI
                     }
                 }
 
-                Logger.Info("Posting file data");
+                Logger.Debug("Posting file data");
                 var responseString = SendRequestBase(request, null, this);
 
                 return responseString;

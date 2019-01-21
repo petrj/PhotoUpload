@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using GAPI;
 using Newtonsoft.Json;
+using System.Net;
 
 namespace PhotoUpload
 {
@@ -194,10 +195,26 @@ namespace PhotoUpload
                 var fIndex = 0;
                 foreach (var f in files)
                 {
-                    Logger.Info($"Uploading file {f}");
-
                     //  upload file
-                    string uploadToken = _accountConnection.UploadFile(f);
+                    string uploadToken = null;
+                    try
+                    {
+                        uploadToken = _accountConnection.UploadFile(f);
+                    }
+                    catch (WebException ex)
+                    {
+                        if (
+                            (ex.Status == WebExceptionStatus.ProtocolError) &&
+                            (((int)((ex as WebException).Response as HttpWebResponse).StatusCode) == 400)
+                            )
+                            {
+                                //bad image/video data?
+                                uploadToken = null;
+                            } else
+                        {
+                            throw;
+                        }
+                    }
 
                     if (string.IsNullOrEmpty(uploadToken))
                     {
