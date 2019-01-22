@@ -21,6 +21,7 @@ CLI Application for uploading media to Google Photo
 	    "https://www.googleapis.com/auth/photoslibrary",
 	    "https://www.googleapis.com/auth/photoslibrary.readonly",
 	    "https://www.googleapis.com/auth/photoslibrary.readonly.appcreateddata",
+	    "https://www.googleapis.com/auth/drive.photos.readonly"
 	    ]
 	}
 	```
