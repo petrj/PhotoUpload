@@ -9,7 +9,7 @@ CLI Application for uploading media to Google Photo
 
 - Using:
 
-	PhotoUpload.exe directoryName
+	`PhotoUpload.exe directoryName`
 
 	In the same directory as PhotoUpload.exe must be file authInfo.json:
 
