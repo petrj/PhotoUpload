@@ -5,19 +5,8 @@ using System.Net;
 
 namespace GAPI
 {
-    public class GAPIAlbum : GAPIBaseObject
-    {
-        public string id { get; set; }
-        public string title { get; set; }
-        public string productUrl { get; set; }
-        public bool isWriteable { get; set; }
-
-        public GAPIShareInfo shareInfo { get; set; } = new GAPIShareInfo();
-
-        public string mediaItemsCount { get; set; }
-        public string coverPhotoBaseUrl { get; set; }
-        public string coverPhotoMediaItemId { get; set; }
-
+    public partial class GAPIAlbum : GAPIBaseObject
+    {      
         public static GAPIAlbum CreateAlbum(GAPIAccountConnection conn, string albumTitle)
         {
             Logger.Info($"Creating album {albumTitle}");
@@ -35,7 +24,7 @@ namespace GAPI
 
                 newAlbum.SaveToFile("newAlbum.json");
 
-                return GAPIAccountConnection.SendRequest<GAPIAlbum>(url, newAlbum, conn);
+                return GAPICommunication.SendRequest<GAPIAlbum>(url, newAlbum, conn);
             }
             catch (Exception ex)
             {
@@ -55,7 +44,7 @@ namespace GAPI
             {
                 var url = $"https://photoslibrary.googleapis.com/v1/albums/{idFix}";
 
-                var alb = GAPIAccountConnection.SendRequest<GAPIAlbum>(url, null, "GET", conn);
+                var alb = GAPICommunication.SendRequest<GAPIAlbum>(url, null, "GET", conn);
 
                 Logger.Info(alb.ToString());
 
@@ -117,7 +106,7 @@ namespace GAPI
                     newMediaItems.newMediaItems.Add(newMediaItem);
                 }
 
-                var newMediaItemResults = GAPIAccountConnection.SendRequest<GAPINewMediaItemResults>(url, newMediaItems, conn);
+                var newMediaItemResults = GAPICommunication.SendRequest<GAPINewMediaItemResults>(url, newMediaItems, conn);
 
                 Logger.Info(newMediaItemResults.ToString());
 

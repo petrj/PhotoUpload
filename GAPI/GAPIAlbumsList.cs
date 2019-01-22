@@ -5,10 +5,8 @@ using System.Net;
 
 namespace GAPI
 {
-    public class GAPIAlbumsList : GAPIBaseObject
+    public partial class GAPIAlbumsList : GAPIBaseObject
     {
-        public List<GAPIAlbum> albums { get; set; } = new List<GAPIAlbum>();
-        public string nextPageToken { get; set; }
 
         public static GAPIAlbumsList GetAllAlbums(GAPIAccountConnection conn)
         {
@@ -52,7 +50,7 @@ namespace GAPI
                     url += $"&pageToken={pageToken}";
                 }
 
-                return GAPIAccountConnection.SendRequest<GAPIAlbumsList>(url, null , "GET", conn);
+                return GAPICommunication.SendRequest<GAPIAlbumsList>(url, null , "GET", conn);
             }
             catch (Exception ex)
             {

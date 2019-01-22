@@ -23,30 +23,36 @@
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="GAPIAccountConnection.cs" />
+    <Compile Include="GAPILogger.cs" />
+    <Compile Include="GAPICommunication.cs" />
+    <Compile Include="GAPIObjects\GAPIAccessToken.cs" />
+    <Compile Include="GAPIObjects\GAPIAlbum.cs" />
+    <Compile Include="GAPIObjects\GAPIAlbumPosition.cs" />
+    <Compile Include="GAPIObjects\GAPIAlbumsList.cs" />
+    <Compile Include="GAPIObjects\GAPIContributorInfo.cs" />
+    <Compile Include="GAPIObjects\GAPIMediaItem.cs" />
+    <Compile Include="GAPIObjects\GAPIMediaMetadata.cs" />
+    <Compile Include="GAPIObjects\GAPINewAlbum.cs" />
+    <Compile Include="GAPIObjects\GAPINewMediaItemResult.cs" />
+    <Compile Include="GAPIObjects\GAPINewMediaItemResults.cs" />
+    <Compile Include="GAPIObjects\GAPINewMediaItems.cs" />
+    <Compile Include="GAPIObjects\GAPIPhoto.cs" />
+    <Compile Include="GAPIObjects\GAPIPositionType.cs" />
+    <Compile Include="GAPIObjects\GAPISharedAlbumOptions.cs" />
+    <Compile Include="GAPIObjects\GAPIShareInfo.cs" />
+    <Compile Include="GAPIObjects\GAPISimpleMediaItem.cs" />
+    <Compile Include="GAPIObjects\GAPIStatus.cs" />
+    <Compile Include="GAPIObjects\GAPIVideo.cs" />
+    <Compile Include="GAPIObjects\GAPIVideoProcessingStatus.cs" />
+    <Compile Include="GAPIObjects\GLAPINewMediaItem.cs" />
+    <Compile Include="GAPIAccessToken.cs" />
     <Compile Include="GAPIAlbum.cs" />
-    <Compile Include="GAPIAlbumPosition.cs" />
     <Compile Include="GAPIAlbumsList.cs" />
     <Compile Include="GAPIBaseObject.cs" />
-    <Compile Include="GAPIAccessToken.cs" />
     <Compile Include="GAPIClientAuthorizationInfo.cs" />
-    <Compile Include="GAPIAccountConnection.cs" />
-    <Compile Include="GAPIContributorInfo.cs" />
-    <Compile Include="GAPIMediaItem.cs" />
-    <Compile Include="GAPIMediaMetadata.cs" />
-    <Compile Include="GAPIPhoto.cs" />
-    <Compile Include="GAPIStatus.cs" />
-    <Compile Include="GAPINewAlbum.cs" />
-    <Compile Include="GAPINewMediaItemResult.cs" />
-    <Compile Include="GAPINewMediaItemResults.cs" />
-    <Compile Include="GAPINewMediaItems.cs" />
-    <Compile Include="GAPIPositionType.cs" />
-    <Compile Include="GAPISharedAlbumOptions.cs" />
-    <Compile Include="GAPIShareInfo.cs" />
-    <Compile Include="GAPISimpleMediaItem.cs" />
-    <Compile Include="GAPIVideo.cs" />
-    <Compile Include="GLAPINewMediaItem.cs" />
-    <Compile Include="GAPIVideoProcessingStatus.cs" />
-    <Compile Include="GAPILogger.cs" />
+    <Compile Include="GAPIObjects\GAPIAbout.cs" />
+    <Compile Include="GAPIAbout.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System.Net" />
@@ -73,6 +79,9 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="GAPIObjects\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
