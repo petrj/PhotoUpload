@@ -37,14 +37,6 @@ namespace PhotoUpload
             }
         }
 
-        public string JournalPathIncomplete
-        {
-            get
-            {
-                return $"{GAPIBaseObject.AppDataDir}journalIncomplete.json";
-            }
-        }
-
         public string AuthInfoPath
         {
             get
@@ -128,11 +120,10 @@ namespace PhotoUpload
             }
         }
 
-        public void UploadFolders(DirectoryInfo directory)
+        public void UploadFolders(DirectoryInfo directory, bool reupload = false)
         {
             try
             {
-
                 Logger.Info($"Uploading all folders from {directory.Name}");
 
                 // uploading self
@@ -150,7 +141,7 @@ namespace PhotoUpload
 
                 foreach (var dir in dirs)
                 {
-                    UploadFolderToAlbum(new DirectoryInfo(dir));
+                    UploadFolderToAlbum(new DirectoryInfo(dir), reupload);
                 }
             }
             catch (Exception ex)
@@ -160,7 +151,7 @@ namespace PhotoUpload
             }
         }
 
-        public void UploadFolderToAlbum(DirectoryInfo directory)
+        private void UploadFolderToAlbum(DirectoryInfo directory, bool reupload = false)
         {
             try
             {
@@ -170,15 +161,20 @@ namespace PhotoUpload
                 var alreadyUploadedJournalItem = _uploadedJournal.Directory(directory.FullName);
                 if (alreadyUploadedJournalItem != null)
                 {
-                    Logger.Warning($"Folder {directory.FullName} is already uploaded with id {alreadyUploadedJournalItem.AlbumId}");
-                    return;
+                    if (reupload)
+                    {
+                        Logger.Warning($"Reuploading folder {directory.FullName} with id {alreadyUploadedJournalItem.AlbumId}");
+                    }
+                    else
+                    {
+                        Logger.Warning($"Folder {directory.FullName} is already uploaded with id {alreadyUploadedJournalItem.AlbumId}");
+                        return;
+                    }
                 }
-
-                //Logger.Info($"Searching all files in {directory.Name}");
 
                 // https://stackoverflow.com/questions/7039580/multiple-file-extensions-searchpattern-for-system-io-directory-getfiles/7039649
                 var files = Directory.GetFiles(directory.FullName, "*.*", SearchOption.TopDirectoryOnly)
-                .Where(f => AllowedExtensions.Contains(Path.GetExtension(f).ToLower())).ToList();
+                                        .Where(f => AllowedExtensions.Contains(Path.GetExtension(f).ToLower())).ToList();
 
                 Logger.Info($"Files found: {files.Count}");
 
@@ -191,32 +187,17 @@ namespace PhotoUpload
 
                 string albumId;
 
-                // testing incomplete journal
-                if (File.Exists(JournalPathIncomplete))
+                if (alreadyUploadedJournalItem != null)
                 {
                     // album is already created
-                    var alb = GAPIBaseObject.LoadFromFile<UploadedJournalItem>(JournalPathIncomplete);
-                    if (alb.DirectoryName != directory.FullName)
-                    {
-                        throw new Exception($"Invalid folder in {alb.DirectoryName} in {JournalPathIncomplete} ({directory.FullName} was expected)");
-                    }
-                    albumId = alb.AlbumId;
-
-                    Logger.Info($"Resuming uploading folder ({directory.FullName})");
+                    albumId = alreadyUploadedJournalItem.AlbumId;
                 } else
                 {
-                    //  create album
+                    //  creating album
                     var alb = GAPIAlbum.CreateAlbum(_accountConnection, directory.Name);
                     albumId = alb.id;
 
-                    // creating incomplete journal
-                    var incompleteAlb = new UploadedJournalItem()
-                    {
-                        AlbumId = albumId,
-                        DirectoryName = directory.FullName
-                    };
-
-                    incompleteAlb.SaveToFile(JournalPathIncomplete);
+                    AddToJournal(directory.FullName, albumId);
                 }
 
                 // batch upload
@@ -277,10 +258,6 @@ namespace PhotoUpload
                     Logger.Info($"No file uploaded");
                 }
 
-                AddToJournal(directory.FullName, Guid.NewGuid().ToString());
-
-                // deleting incomplete journal
-                File.Delete(JournalPathIncomplete);
             }
             catch (Exception ex)
             {

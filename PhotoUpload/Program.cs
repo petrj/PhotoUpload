@@ -23,22 +23,37 @@ namespace PhotoUpload
                 return;
             }
 
-            if (args.Length > 1)
+            if (args.Length > 2)
             {
                 Console.WriteLine("Too many arguments");
                 return;
             }
 
-            if (!Directory.Exists(args[0]))
+            string directory = null;
+            bool reupload = false;
+
+            foreach (var arg in args)
             {
-                Console.WriteLine($"Directory {args[0]} does not exist");
+                if (arg == "--reupload")
+                {
+                    reupload = true;
+                }
+                else
+                {
+                    directory = arg;
+                }
+            }
+
+            if (!Directory.Exists(directory))
+            {
+                Console.WriteLine($"Directory {directory} does not exist");
                 return;
             }
 
             var photoUpload = new PhotoUpload();
             photoUpload.Connect();
 
-            photoUpload.UploadFolders(new DirectoryInfo(args[0]));
+            photoUpload.UploadFolders(new DirectoryInfo(directory), reupload);
 
             Logger.Info();
 
