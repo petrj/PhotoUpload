@@ -253,8 +253,8 @@ namespace PhotoUpload
                     {
                         if (actualBatch.Count > 0)
                         {
-                            actualBatch = new Dictionary<string, string>();
                             fileTokensBatch.Add(actualBatch);
+                            actualBatch = new Dictionary<string, string>();
                         }
                         fIndex = 0;
                     }

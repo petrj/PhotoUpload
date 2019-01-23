@@ -22,8 +22,6 @@ namespace GAPI
 
                 var postData = JsonConvert.SerializeObject(newAlbum);
 
-                newAlbum.SaveToFile("newAlbum.json");
-
                 return GAPICommunication.SendRequest<GAPIAlbum>(url, newAlbum, conn);
             }
             catch (Exception ex)
