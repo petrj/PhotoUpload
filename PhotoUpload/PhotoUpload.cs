@@ -37,6 +37,14 @@ namespace PhotoUpload
             }
         }
 
+        public string JournalPathIncomplete
+        {
+            get
+            {
+                return $"{GAPIBaseObject.AppDataDir}journalIncomplete.json";
+            }
+        }
+
         public string AuthInfoPath
         {
             get
@@ -181,9 +189,35 @@ namespace PhotoUpload
 
                 files.Sort();
 
-                //  create album
+                string albumId;
 
-                var alb = GAPIAlbum.CreateAlbum(_accountConnection, directory.Name);
+                // testing incomplete journal
+                if (File.Exists(JournalPathIncomplete))
+                {
+                    // album is already created
+                    var alb = GAPIBaseObject.LoadFromFile<UploadedJournalItem>(JournalPathIncomplete);
+                    if (alb.DirectoryName != directory.FullName)
+                    {
+                        throw new Exception($"Invalid folder in {alb.DirectoryName} in {JournalPathIncomplete} ({directory.FullName} was expected)");
+                    }
+                    albumId = alb.AlbumId;
+
+                    Logger.Info($"Resuming uploading folder ({directory.FullName})");
+                } else
+                {
+                    //  create album
+                    var alb = GAPIAlbum.CreateAlbum(_accountConnection, directory.Name);
+                    albumId = alb.id;
+
+                    // creating incomplete journal
+                    var incompleteAlb = new UploadedJournalItem()
+                    {
+                        AlbumId = albumId,
+                        DirectoryName = directory.FullName
+                    };
+
+                    incompleteAlb.SaveToFile(JournalPathIncomplete);
+                }
 
                 // batch upload
                 var batchCount = 20;
@@ -235,15 +269,18 @@ namespace PhotoUpload
                 {
                     foreach (var batch in fileTokensBatch)
                     {
-                        var uploadedItems = GAPIAlbum.AddMediaItemsToAlbum(_accountConnection, alb.id, batch);
+                        var uploadedItems = GAPIAlbum.AddMediaItemsToAlbum(_accountConnection, albumId, batch);
                     }
-
-                    AddToJournal(directory.FullName, Guid.NewGuid().ToString());
                 }
                 else
                 {
                     Logger.Info($"No file uploaded");
                 }
+
+                AddToJournal(directory.FullName, Guid.NewGuid().ToString());
+
+                // deleting incomplete journal
+                File.Delete(JournalPathIncomplete);
             }
             catch (Exception ex)
             {
