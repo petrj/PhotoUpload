@@ -195,35 +195,24 @@ namespace PhotoUpload
                 var fIndex = 0;
                 foreach (var f in files)
                 {
-                    //  upload file
-                    string uploadToken = null;
-                    try
+                    var fi = new FileInfo(f);
+                    if (fi.Length == 0)
                     {
-                        uploadToken = _accountConnection.UploadFile(f);
+                        Logger.Warning($"Skipping empty file ({f})");
+                        continue;
                     }
-                    catch (WebException ex)
-                    {
-                        if (
-                            (ex.Status == WebExceptionStatus.ProtocolError) &&
-                            (((int)((ex as WebException).Response as HttpWebResponse).StatusCode) == 400)
-                            )
-                            {
-                                //bad image/video data?
-                                uploadToken = null;
-                            } else
-                        {
-                            throw;
-                        }
-                    }
+
+                    //  uploading file
+
+                    var uploadToken = _accountConnection.UploadFile(f);
 
                     if (string.IsNullOrEmpty(uploadToken))
                     {
                         Logger.Warning($"Empty upload file token for file ({f})");
+                        continue;
                     }
-                    else
-                    {
-                        actualBatch.Add(uploadToken, Path.GetFileName(f));
-                    }
+
+                    actualBatch.Add(uploadToken, Path.GetFileName(f));
 
                     fIndex++;
                     if (fIndex > batchCount)

@@ -27,10 +27,14 @@
     <Compile Include="GAPILogger.cs" />
     <Compile Include="GAPICommunication.cs" />
     <Compile Include="GAPIObjects\GAPIAccessToken.cs" />
+    <Compile Include="GAPIObjects\GAPIAdditionalRoleInfo.cs" />
     <Compile Include="GAPIObjects\GAPIAlbum.cs" />
     <Compile Include="GAPIObjects\GAPIAlbumPosition.cs" />
     <Compile Include="GAPIObjects\GAPIAlbumsList.cs" />
     <Compile Include="GAPIObjects\GAPIContributorInfo.cs" />
+    <Compile Include="GAPIObjects\GAPIFeature.cs" />
+    <Compile Include="GAPIObjects\GAPIFormats.cs" />
+    <Compile Include="GAPIObjects\GAPIMaxUploadSize.cs" />
     <Compile Include="GAPIObjects\GAPIMediaItem.cs" />
     <Compile Include="GAPIObjects\GAPIMediaMetadata.cs" />
     <Compile Include="GAPIObjects\GAPINewAlbum.cs" />
@@ -38,11 +42,16 @@
     <Compile Include="GAPIObjects\GAPINewMediaItemResults.cs" />
     <Compile Include="GAPIObjects\GAPINewMediaItems.cs" />
     <Compile Include="GAPIObjects\GAPIPhoto.cs" />
+    <Compile Include="GAPIObjects\GAPIPicture.cs" />
     <Compile Include="GAPIObjects\GAPIPositionType.cs" />
+    <Compile Include="GAPIObjects\GAPIQuotaBytesByService.cs" />
+    <Compile Include="GAPIObjects\GAPIRoleSets.cs" />
     <Compile Include="GAPIObjects\GAPISharedAlbumOptions.cs" />
     <Compile Include="GAPIObjects\GAPIShareInfo.cs" />
     <Compile Include="GAPIObjects\GAPISimpleMediaItem.cs" />
     <Compile Include="GAPIObjects\GAPIStatus.cs" />
+    <Compile Include="GAPIObjects\GAPITeamDriveThemes.cs" />
+    <Compile Include="GAPIObjects\GAPIUser.cs" />
     <Compile Include="GAPIObjects\GAPIVideo.cs" />
     <Compile Include="GAPIObjects\GAPIVideoProcessingStatus.cs" />
     <Compile Include="GAPIObjects\GLAPINewMediaItem.cs" />
@@ -53,6 +62,7 @@
     <Compile Include="GAPIClientAuthorizationInfo.cs" />
     <Compile Include="GAPIObjects\GAPIAbout.cs" />
     <Compile Include="GAPIAbout.cs" />
+    <Compile Include="GAPIQuotaBytesByService.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System.Net" />
@@ -80,8 +90,6 @@
     <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="GAPIObjects\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

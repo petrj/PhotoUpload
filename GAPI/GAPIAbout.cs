@@ -18,7 +18,7 @@ namespace GAPI
         {
             get
             {
-                return (quotaBytesTotal / Math.Pow(10, 9)).ToString("N2");
+                return (quotaBytesUsed / Math.Pow(10, 9)).ToString("N2");
             }
         }
 
@@ -35,6 +35,18 @@ namespace GAPI
             get
             {
                 return (quotaBytesUsedAggregate / Math.Pow(10, 9)).ToString("N2");
+            }
+        }
+
+        public string GBytesFreeTotal
+        {
+            get
+            {
+                var freeBytes = (quotaBytesTotal - quotaBytesUsedAggregate);
+                if (freeBytes == 0)
+                    return 0.ToString("N2");
+
+                return (freeBytes / Math.Pow(10, 9)).ToString("N2");
             }
         }
 
