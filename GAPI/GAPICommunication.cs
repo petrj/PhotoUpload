@@ -50,7 +50,7 @@ namespace GAPI
                     }
                 }
 
-                Logger.Info($"ContentType: {request.ContentType}");
+                Logger.Debug($"ContentType: {request.ContentType}");
 
                 if (conn != null)
                 {

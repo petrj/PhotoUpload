@@ -6,7 +6,7 @@ using System.Net;
 namespace GAPI
 {
     public partial class GAPIAlbum : GAPIBaseObject
-    {      
+    {
         public static GAPIAlbum CreateAlbum(GAPIAccountConnection conn, string albumTitle)
         {
             Logger.Info($"Creating album {albumTitle}");
@@ -45,8 +45,6 @@ namespace GAPI
                 var url = $"https://photoslibrary.googleapis.com/v1/albums/{idFix}";
 
                 var alb = GAPICommunication.SendRequest<GAPIAlbum>(url, null, "GET", conn);
-
-                Logger.Info(alb.ToString());
 
                 return alb;
             }
@@ -107,8 +105,6 @@ namespace GAPI
                 }
 
                 var newMediaItemResults = GAPICommunication.SendRequest<GAPINewMediaItemResults>(url, newMediaItems, conn);
-
-                Logger.Info(newMediaItemResults.ToString());
 
                 return newMediaItemResults;
             }
