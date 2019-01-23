@@ -46,9 +46,9 @@ namespace googleInfo
                 Logger.Info($"Name           : {about.name}");
                 Logger.Info($"Email          : {about.user.emailAddress}");
                 Logger.Info();
-                Logger.Info($"Total Size (GB): {about.GBytesTotal}");
-                Logger.Info($"Used Size (GB) : {about.GBytesUsedByAppsTotal}");
-                Logger.Info($"Free Size  (GB): {about.GBytesFreeTotal}");
+                Logger.Info($"Total Size (GB): {about.GBytesTotal.PadLeft(10,' ')}");
+                Logger.Info($"Used Size  (GB): {about.GBytesUsedByAppsTotal.PadLeft(10, ' ')}");
+                Logger.Info($"Free Size  (GB): {about.GBytesFreeTotal.PadLeft(10, ' ')}");
             }
         }
     }

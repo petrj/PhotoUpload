@@ -1,8 +1,10 @@
 # PhotoUpload
 
-CLI Application for uploading media to Google Photo
+CLI Application for uploading media to Google Photos
 
-- Directories on file system uploaded as Google Photo albums 
+- Directories on file system uploaded as albums 
+- Recurse uploading
+
 - Mono & .NET
 - Linux & Windows compatibile
 - Powered by GAPI (Mono & .NET Google API)
@@ -11,9 +13,17 @@ CLI Application for uploading media to Google Photo
 
 	`PhotoUpload.exe directoryName`
     
-    `PhotoUpload.exe directoryName --reupload`
+	`PhotoUpload.exe directoryName --reupload`
 
-	In the same directory as PhotoUpload.exe must be file authInfo.json:
+
+- Already uploaded directories are stored in journal.json
+- Access token is stored in token.json
+
+- Building:
+
+	`msbuild PhotoUpload.sln`
+
+- Create configuration file authInfo.json:
 
 	```
 	{
@@ -28,12 +38,5 @@ CLI Application for uploading media to Google Photo
 	}
 	```
 	
-- Recurse uploading
+- OAuth2 credentials `client_id` and `client_secret` generate on Google API Console Credentials page (https://console.developers.google.com/apis/credentials)
 
-- Already uploaded directories are stored in journal.json
-
-- Acces token is stored in token.json
-
-- Building:
-
-	`msbuild PhotoUpload.sln`
