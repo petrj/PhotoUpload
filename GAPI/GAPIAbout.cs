@@ -57,9 +57,7 @@ namespace GAPI
                 var url = "https://www.googleapis.com/drive/v2/about";
 
                 var about = GAPICommunication.SendRequest<GAPIAbout>(url, null, "GET", conn);
-
-                Logger.Info(about.ToString());
-
+               
                 return about;
             }
             catch (Exception ex)

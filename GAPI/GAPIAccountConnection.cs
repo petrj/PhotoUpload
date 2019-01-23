@@ -53,7 +53,7 @@ namespace GAPI
                     Authenticate();
                 }
 
-                Logger.Info($"Access token will expire at [{AccessToken.expires_at.ToString()}]");
+                Logger.Debug($"Access token will expire at [{AccessToken.expires_at.ToString()}]");
             }
             catch (Exception ex)
             {
