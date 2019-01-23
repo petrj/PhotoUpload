@@ -28,11 +28,11 @@ namespace GAPI
 
                 if (request.Method == "GET")
                 {
-                    Logger.Info($"Sending GET request to url: {request.RequestUri}");
+                    Logger.Debug($"Sending GET request to url: {request.RequestUri}");
                 }
                 else
                 {
-                    Logger.Info($"Sending POST request to url: {request.RequestUri}");
+                    Logger.Debug($"Sending POST request to url: {request.RequestUri}");
 
                     if (request.ContentLength >= 0)
                     {
