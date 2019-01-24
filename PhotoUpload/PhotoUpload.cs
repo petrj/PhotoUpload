@@ -127,7 +127,7 @@ namespace PhotoUpload
                 Logger.Info($"Uploading all folders from {directory.Name}");
 
                 // uploading self
-                UploadFolderToAlbum(directory);
+                UploadFolderToAlbum(directory, reupload);
 
                 var allDirs = directory.GetDirectories("*.*", SearchOption.AllDirectories);
 

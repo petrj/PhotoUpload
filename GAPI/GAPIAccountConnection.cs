@@ -218,8 +218,15 @@ namespace GAPI
                     }
                 }
 
+                string responseString;
                 Logger.Debug("Posting file data");
-                var responseString = GAPICommunication.SendRequest(request, this);
+                try
+                {
+                    responseString = GAPICommunication.SendRequest(request, this);
+                } finally
+                {
+                    requestStream.Dispose();
+                }
 
                 return responseString;
 

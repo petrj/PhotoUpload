@@ -94,29 +94,29 @@ namespace GAPI
                     Logger.Debug($"Header: {header.ToString()}");
                 }
 
-                var response = (HttpWebResponse)request.GetResponse();
+                using (var response = (HttpWebResponse)request.GetResponse())
+                {
+                    string responseString;
+                    using (var sr = new StreamReader(response.GetResponseStream()))
+                    {
+                        responseString = sr.ReadToEnd();
+                    }
 
-                var responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();
+                    Logger.Debug($"Response: {responseString}");
+                    Logger.Debug($"StatusCode: {response.StatusCode}");
+                    Logger.Debug($"StatusDescription: {response.StatusDescription}");
 
-                Logger.Debug($"Response: {responseString}");
-                Logger.Debug($"StatusCode: {response.StatusCode}");
-                Logger.Debug($"StatusDescription: {response.StatusDescription}");
+                    Logger.Debug($"ContentLength: {response.ContentLength}");
+                    Logger.Debug($"ContentType: {response.ContentType}");
+                    Logger.Debug($"ContentEncoding: {response.ContentEncoding}");
 
-                Logger.Debug($"ContentLength: {response.ContentLength}");
-                Logger.Debug($"ContentType: {response.ContentType}");
-                Logger.Debug($"ContentEncoding: {response.ContentEncoding}");
-
-                return responseString;
+                    return responseString;
+                }
             }
             catch (Exception ex)
             {
                 Logger.Error(ex);
                 throw;
-            }
-            finally
-            {
-                request.GetResponse().Dispose();
-                request.GetRequestStream().Dispose();
             }
         }
 
