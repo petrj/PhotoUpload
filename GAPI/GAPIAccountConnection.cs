@@ -191,6 +191,7 @@ namespace GAPI
             try
             {
                 Logger.Info($"Uploading file {fileName}");
+                Logger.DebugFreeMem("before uploading file");
 
                 // https://developers.google.com/photos/library/guides/upload-media
 
@@ -209,23 +210,22 @@ namespace GAPI
                 // fill request stream buffer with file
                 var bytesRead = 0;
                 byte[] buffer = new byte[1024];
-                var requestStream = request.GetRequestStream();
-                using (var fs = System.IO.File.OpenRead(fileName))
-                {
-                    while ((bytesRead = fs.Read(buffer, 0, buffer.Length)) != 0)
-                    {
-                        requestStream.Write(buffer, 0, bytesRead);
-                    }
-                }
 
                 string responseString;
-                Logger.Debug("Posting file data");
-                try
+
+                using (var requestStream = request.GetRequestStream())
                 {
+                    using (var fs = System.IO.File.OpenRead(fileName))
+                    {
+                        while ((bytesRead = fs.Read(buffer, 0, buffer.Length)) != 0)
+                        {
+                            requestStream.Write(buffer, 0, bytesRead);
+                        }
+                    }
+
+                    Logger.Debug("Posting file data");
+
                     responseString = GAPICommunication.SendRequest(request, this);
-                } finally
-                {
-                    requestStream.Dispose();
                 }
 
                 return responseString;
@@ -234,6 +234,10 @@ namespace GAPI
             {
                 Logger.Error(ex);
                 throw;
+            }
+            finally
+            {
+                Logger.DebugFreeMem("after uploading file");
             }
         }
     }

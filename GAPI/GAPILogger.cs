@@ -55,6 +55,12 @@ namespace GAPI
             _logger.Warn(message);
         }
 
+        public static void DebugFreeMem(string title = "")
+        {
+            var freeMemInfo = $"Free available memory {title}: " + (new PerformanceCounter("Memory", "Available MBytes")).NextValue() + " MB";
+            Debug(freeMemInfo);
+        }
+
         public static void Debug(string message)
         {
             _logger.Debug(message);

@@ -1,8 +1,8 @@
 # PhotoUpload
 
-CLI Application for uploading media to Google Photos
+Command line application for uploading photos and videos to Google Photos
 
-- Directories on file system uploaded as albums 
+- Directories on file system uploaded as albums
 - Recurse uploading
 
 - Mono & .NET
@@ -12,7 +12,7 @@ CLI Application for uploading media to Google Photos
 - Using:
 
 	`PhotoUpload.exe directoryName`
-    
+
 	`PhotoUpload.exe directoryName --reupload`
 
 
@@ -31,12 +31,10 @@ CLI Application for uploading media to Google Photos
 	  "client_secret": "xxxxxxxxxxxxxxxxxxxxxxxx",
 	  "scopes": [
 	    "https://www.googleapis.com/auth/photoslibrary",
-	    "https://www.googleapis.com/auth/photoslibrary.readonly",
-	    "https://www.googleapis.com/auth/photoslibrary.readonly.appcreateddata",
 	    "https://www.googleapis.com/auth/drive.photos.readonly"
 	    ]
 	}
 	```
-	
+
 - OAuth2 credentials `client_id` and `client_secret` generate on Google API Console Credentials page (https://console.developers.google.com/apis/credentials)
 
