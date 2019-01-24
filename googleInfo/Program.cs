@@ -46,9 +46,15 @@ namespace googleInfo
                 Logger.Info($"Name           : {about.name}");
                 Logger.Info($"Email          : {about.user.emailAddress}");
                 Logger.Info();
-                Logger.Info($"Total Size (GB): {about.GBytesTotal.PadLeft(10,' ')}");
-                Logger.Info($"Used Size  (GB): {about.GBytesUsedByAppsTotal.PadLeft(10, ' ')}");
-                Logger.Info($"Free Size  (GB): {about.GBytesFreeTotal.PadLeft(10, ' ')}");
+                Logger.Info($"Total Size (GB): {about.GBytesTotal.PadLeft(8,' ')}");
+                Logger.Info($"Used Size  (GB): {about.GBytesUsedByAppsTotal.PadLeft(8, ' ')}");
+                Logger.Info($"Free Size  (GB): {about.GBytesFreeTotal.PadLeft(8, ' ')}");
+                Logger.Info();
+                Logger.Info("Used size by service (GB):");
+                foreach (var sq in about.quotaBytesByService)
+                {
+                    Logger.Info($"{sq.serviceName.PadRight(15,' ')}: {sq.GBytesUsed.PadLeft(8, ' ')}");
+                }
             }
         }
     }
