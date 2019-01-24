@@ -228,6 +228,6 @@ namespace GAPI
                 Logger.Error(ex);
                 throw;
             }
-        }    
+        }
     }
 }

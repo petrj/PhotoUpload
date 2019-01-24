@@ -113,6 +113,11 @@ namespace GAPI
                 Logger.Error(ex);
                 throw;
             }
+            finally
+            {
+                request.GetResponse().Dispose();
+                request.GetRequestStream().Dispose();
+            }
         }
 
         public static T SendRequest<T>(string url,
