@@ -3,7 +3,7 @@
 Command line application for uploading photos and videos to Google Photos
 
 - Directories on file system uploaded as albums
-- Recurse uploading
+- Recursive uploading
 
 - Mono & .NET
 - Linux & Windows compatibile
@@ -26,11 +26,11 @@ Command line application for uploading photos and videos to Google Photos
 
   `PhotoUpload.exe --info --json`
 
-    - for showing allGoogle account informations in json format
+    - for showing all Google account informations in json format
 
   `PhotoUpload.exe --help`
 
-    - for showing this help and exit
+    - for showing help and exit
 
 
 - Already uploaded directories are stored in journal.json
@@ -53,5 +53,5 @@ Command line application for uploading photos and videos to Google Photos
 	}
 	```
 
-- OAuth2 credentials `client_id` and `client_secret` generate on Google API Console Credentials page (https://console.developers.google.com/apis/credentials)
+- OAuth2 credentials `client_id` and `client_secret` can be generated on Google API Console Credentials page (https://console.developers.google.com/apis/credentials)
 
