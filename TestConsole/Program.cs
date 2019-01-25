@@ -46,7 +46,7 @@ namespace TestConsole
             //var newItems = GAPIAlbum.AddMediaItemToAlbum(accountConnection, "non existing alb", @"C:\temp\file.jpg");
 
             var about = GAPIAbout.AboutUser(accountConnection);
-    
+
             Console.WriteLine("Process finished. <ENTER>");
             Console.ReadLine();
         }

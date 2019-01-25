@@ -29,6 +29,14 @@ namespace PhotoUpload
         private GAPIClientAuthorizationInfo _authInfo;
         private GAPIAccountConnection _accountConnection;
 
+        public GAPIAccountConnection AccountConnection
+        {
+            get
+            {
+                return _accountConnection;
+            }
+        }
+
         public string JournalPath
         {
             get

@@ -9,11 +9,28 @@ Command line application for uploading photos and videos to Google Photos
 - Linux & Windows compatibile
 - Powered by GAPI (Mono & .NET Google API)
 
-- Using:
+- Usage:
 
-	`PhotoUpload.exe directoryName`
+  `PhotoUpload.exe directoryName`
 
-	`PhotoUpload.exe directoryName --reupload`
+    - for uploading directoryName recursively
+
+  `PhotoUpload.exe directoryName --reupload`
+
+    - for reuploading directoryName recursively
+    - directories in journal.json are reuploaded, other directories are uploaded as usually
+
+  `PhotoUpload.exe --info`
+
+    - for showing Google account informations such as name, email and free size on drive
+
+  `PhotoUpload.exe --info --json`
+
+    - for showing allGoogle account informations in json format
+
+  `PhotoUpload.exe --help`
+
+    - for showing this help and exit
 
 
 - Already uploaded directories are stored in journal.json
