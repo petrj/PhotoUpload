@@ -81,8 +81,11 @@ namespace GAPI
                     }
                 }
 
+                request.Timeout = 10 * 60 * 1000; // 10 min timeout
+
                 Logger.Debug($"Method: {request.Method}");
                 Logger.Debug($"RequestUri: {request.RequestUri}");
+                Logger.Debug($"Timeout: {request.Timeout}");
                 Logger.Debug($"ContentType: {request.ContentType}");
                 if (request.ContentLength > 0)
                 {
