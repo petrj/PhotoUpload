@@ -70,7 +70,10 @@ namespace PhotoUpload
             }
 
             var photoUpload = new PhotoUpload();
-            photoUpload.Connect();
+            if (!photoUpload.Connect())
+            {
+                return;
+            }
 
             if (info)
             {

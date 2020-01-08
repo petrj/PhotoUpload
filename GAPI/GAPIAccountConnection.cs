@@ -191,7 +191,6 @@ namespace GAPI
             try
             {
                 Logger.Info($"Uploading file {fileName}");
-                Logger.DebugFreeMem("before uploading file");
 
                 // https://developers.google.com/photos/library/guides/upload-media
 
@@ -234,10 +233,6 @@ namespace GAPI
             {
                 Logger.Error(ex);
                 throw;
-            }
-            finally
-            {
-                Logger.DebugFreeMem("after uploading file");
             }
         }
     }
