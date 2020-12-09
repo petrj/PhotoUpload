@@ -6,7 +6,8 @@ using System.Net;
 namespace GAPI
 {
     public partial class GAPIAlbum : GAPIBaseObject
-    {
+    {   
+    
         public static GAPIAlbum CreateAlbum(GAPIAccountConnection conn, string albumTitle)
         {
             Logger.Info($"Creating album {albumTitle}");
@@ -112,5 +113,6 @@ namespace GAPI
                 throw;
             }
         }
+
     }
 }

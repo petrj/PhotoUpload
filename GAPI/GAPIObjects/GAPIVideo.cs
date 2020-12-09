@@ -10,8 +10,9 @@ namespace GAPI
     {
         public string cameraMake { get; set; }
         public string cameraModel { get; set; }
-        public int fps { get; set; }
+        public string fps { get; set; }
 
-        public GAPIVideoProcessingStatus status { get; set; } = new GAPIVideoProcessingStatus();
+        //public GAPIVideoProcessingStatus status { get; set; } = new GAPIVideoProcessingStatus();
+        public string status { get; set; }
     }
 }

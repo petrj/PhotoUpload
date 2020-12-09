@@ -10,9 +10,9 @@ namespace GAPI
     {
         public string cameraMake { get; set; }
         public string cameraModel { get; set; }
-        public int focalLength { get; set; }
-        public int apertureFNumber { get; set; }
-        public int isoEquivalent { get; set; }
+        public string focalLength { get; set; }
+        public string apertureFNumber { get; set; }
+        public string isoEquivalent { get; set; }
         public string exposureTime { get; set; }
     }
 }

@@ -72,6 +72,7 @@ namespace GAPI
                 var browserUrl = GetUrlForAuthCode();
 
                 Console.WriteLine("Authorize on url:");
+                Logger.Debug("Authorize on url:" + browserUrl);
                 Console.WriteLine();
                 Console.WriteLine(browserUrl);
                 Console.WriteLine();
@@ -208,7 +209,7 @@ namespace GAPI
 
                 // fill request stream buffer with file
                 var bytesRead = 0;
-                byte[] buffer = new byte[1024];
+                byte[] buffer = new byte[16384];
 
                 string responseString;
 

@@ -35,7 +35,7 @@ namespace GAPI
             }
         }
 
-        public static GAPIAlbumsList GetAlbums(GAPIAccountConnection conn, int pageSize = 20, string pageToken = null)
+        private static GAPIAlbumsList GetAlbums(GAPIAccountConnection conn, int pageSize = 20, string pageToken = null)
         {
             // https://developers.google.com/photos/library/reference/rest/v1/albums/list
 

@@ -1,5 +1,6 @@
 ﻿using GAPI;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -42,10 +43,34 @@ namespace TestConsole
 
             //accountConnection.RefreshAccessToken();
             //var albs = GAPIAlbumsList.GetAllAlbums(accountConnection);
-            // var newAlb = GAPIAlbum.CreateAlbum(accountConnection, "Album Y");
-            //var newItems = GAPIAlbum.AddMediaItemToAlbum(accountConnection, "non existing alb", @"C:\temp\file.jpg");
+
+            //var newAlb = GAPIAlbum.CreateAlbum(accountConnection, "Album Y");
+            //var newItems = GAPIAlbum.AddMediaItemToAlbum(accountConnection, newAlb.id, @"/temp/video.mkv");
 
             var about = GAPIAbout.AboutUser(accountConnection);
+
+            Console.WriteLine($"Account name: {about.name}");
+
+            var albs = GAPIAlbumsList.GetAllAlbums(accountConnection);
+
+            Console.WriteLine($"Albums");
+            Console.WriteLine($"---------------------------------");
+            Console.WriteLine($"id,count,title");
+            foreach (var alb in albs.albums)
+            {
+                Console.WriteLine($"{alb.id},{alb.mediaItemsCount,5},{alb.title}");
+            }
+
+            var items = GAPIItemsList.GetAllItems(accountConnection);
+
+            Console.WriteLine($"Items");
+            Console.WriteLine($"---------------------------------");
+            Console.WriteLine($"id,filename,description");
+            foreach (var item in items.mediaItems)
+            {
+                Console.WriteLine($"{item.id},{item.filename},{item.description}");
+            }
+
 
             Console.WriteLine("Process finished. <ENTER>");
             Console.ReadLine();
