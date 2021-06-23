@@ -78,6 +78,7 @@
     <Compile Include="GAPIQuotaBytesByService.cs" />
     <Compile Include="GAPIItemsList.cs" />
     <Compile Include="GAPIObjects\GAPIItemsList.cs" />
+    <Compile Include="VoidedPurchasesList.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System.Net" />

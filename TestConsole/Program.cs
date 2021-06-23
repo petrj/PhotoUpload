@@ -41,12 +41,15 @@ namespace TestConsole
             var accountConnection = new GAPIAccountConnection(authInfo);
             accountConnection.Connect();
 
+            var voidedPurchases = VoidedPurchasesList.GetVoidedPurchases(accountConnection, "net.petrjanousek.OnlineTelevizor");
+
             //accountConnection.RefreshAccessToken();
             //var albs = GAPIAlbumsList.GetAllAlbums(accountConnection);
 
             //var newAlb = GAPIAlbum.CreateAlbum(accountConnection, "Album Y");
             //var newItems = GAPIAlbum.AddMediaItemToAlbum(accountConnection, newAlb.id, @"/temp/video.mkv");
 
+            /*
             var about = GAPIAbout.AboutUser(accountConnection);
 
             Console.WriteLine($"Account name: {about.name}");
@@ -71,7 +74,7 @@ namespace TestConsole
                 Console.WriteLine($"{item.id},{item.filename},{item.description}");
             }
 
-
+            */
             Console.WriteLine("Process finished. <ENTER>");
             Console.ReadLine();
         }
